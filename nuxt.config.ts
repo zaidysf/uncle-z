@@ -84,13 +84,13 @@ export default defineNuxtConfig({
       crawlLinks: true,
       routes: [
         '/',
-        '/profile.md',
-        '/experience.md',
-        '/skills.md',
-        '/education.md',
-        '/github.vue',
-        '/contact.md',
-        '/about.md'
+        '/profile',
+        '/experience',
+        '/skills',
+        '/education',
+        '/github',
+        '/contact',
+        '/about'
       ]
     }
   },
@@ -102,6 +102,19 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { prerender: true },
     '/**': { ssr: true }
+  },
+
+  generate: {
+    routes: [
+      '/',
+      '/profile',
+      '/experience',
+      '/skills',
+      '/education',
+      '/github',
+      '/contact',
+      '/about'
+    ]
   },
 
   compatibilityDate: '2025-01-31'

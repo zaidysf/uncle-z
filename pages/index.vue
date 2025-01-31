@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-screen bg-[#1e1e1e]">
     <!-- Menu Bar -->
-    <div class="bg-[#252526] text-gray-300 px-4 py-2 z-10">
+    <div class="bg-[#252526] text-gray-300 px-4 py-2 sticky top-0 z-50">
       <div class="flex justify-between items-center">
         <div class="flex space-x-4">
           <!-- File Menu -->
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Tabs -->
-    <div class="flex bg-[#2d2d2d] text-gray-400 overflow-x-auto z-10">
+    <div class="flex bg-[#2d2d2d] text-gray-400 overflow-x-auto sticky top-10 z-40">
       <div 
         v-for="tab in visibleTabs" 
         :key="tab.name"
@@ -73,7 +73,7 @@
           'px-4 py-2 border-r border-gray-700 cursor-pointer whitespace-nowrap',
           activeTab === tab.name ? 'bg-[#1e1e1e] text-white' : ''
         ]"
-        @click="activeTab = tab.name"
+        @click="$router.push(`/${tab.name}`)"
       >
         {{ tab.name }}
       </div>
@@ -81,19 +81,21 @@
 
     <!-- Main Content -->
     <div class="flex flex-1 overflow-hidden relative">
-      <!-- Line Numbers -->
-      <div class="bg-[#252526] text-gray-600 py-4 px-2 text-right select-none w-16 absolute left-0 top-0 bottom-0">
-        <div v-for="n in lineCount" :key="n" class="h-6 leading-6" :style="{ transform: `translateY(${-scrollTop}px)` }">{{ n }}</div>
-      </div>
-
-      <!-- Content Area -->
-      <div class="flex-1 overflow-y-auto pl-16" @scroll="handleScroll" ref="contentArea">
-        <div class="p-4" ref="contentWrapper">
-          <component 
-            :is="currentComponent" 
-            v-if="currentComponent"
-            @copy="handleContactCopy" 
-          />
+      <!-- Content Area with Line Numbers -->
+      <div class="flex-1 overflow-y-auto relative" ref="contentArea" @scroll="handleScroll">
+        <!-- Line Numbers -->
+        <div class="bg-[#252526] text-gray-600 py-4 px-2 text-right select-none w-16 fixed z-10">
+          <div v-for="n in lineCount" :key="n" class="h-6 leading-6" :style="{ transform: `translateY(${-scrollTop}px)` }">{{ n }}</div>
+        </div>
+        <!-- Content with left padding for line numbers -->
+        <div class="pl-16">
+          <div class="p-4" ref="contentWrapper">
+            <component 
+              :is="currentComponent" 
+              v-if="currentComponent"
+              @copy="handleContactCopy" 
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -144,21 +146,30 @@ const scrollTop = ref(0)
 const lineCount = ref(0)
 
 const tabs = ref([
-  { name: 'profile.md', visible: true, component: ProfileTab },
-  { name: 'experience.md', visible: true, component: ExperienceTab },
-  { name: 'skills.md', visible: true, component: SkillsTab },
-  { name: 'education.md', visible: true, component: EducationTab },
-  { name: 'github.vue', visible: true, component: GithubTab },
-  { name: 'contact.md', visible: true, component: ContactTab },
-  { name: 'about.md', visible: true, component: AboutTab }
+  { name: 'profile', visible: true, component: ProfileTab },
+  { name: 'experience', visible: true, component: ExperienceTab },
+  { name: 'skills', visible: true, component: SkillsTab },
+  { name: 'education', visible: true, component: EducationTab },
+  { name: 'github', visible: true, component: GithubTab },
+  { name: 'contact', visible: true, component: ContactTab },
+  { name: 'about', visible: true, component: AboutTab }
 ])
 
 const visibleTabs = computed(() => tabs.value.filter(tab => tab.visible))
-const activeTab = ref('profile.md')
+const route = useRoute()
+const router = useRouter()
+const activeTab = computed(() => route.params.tab || 'profile')
 
 const currentComponent = computed(() => {
   const tab = tabs.value.find(t => t.name === activeTab.value && t.visible)
   return tab?.component
+})
+
+// Initial navigation
+onMounted(() => {
+  if (!route.params.tab) {
+    router.push('/profile')
+  }
 })
 
 const fileMenu = [
@@ -198,6 +209,11 @@ onMounted(() => {
     resizeObserver.observe(contentWrapper.value)
   }
   window.addEventListener('resize', updateLineCount)
+  
+  // Initial line count update
+  nextTick(() => {
+    updateLineCount()
+  })
 })
 
 onUnmounted(() => {
