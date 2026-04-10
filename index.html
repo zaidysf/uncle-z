@@ -494,6 +494,30 @@
       gap: 8px;
     }
 
+    .project-stores {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .store-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 5px 12px;
+      background: var(--blue);
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .store-btn:hover {
+      background: #1d4ed8;
+    }
+
     /* ===================== */
     /* SLIDE 5: SKILLS       */
     /* ===================== */
@@ -1179,7 +1203,7 @@
           <a href="https://jarvisclaw.id" target="_blank" class="project-card animate-in d5" data-hover>
             <div class="project-header">
               <div class="project-name">JarvisClaw</div>
-              <div class="project-tag coral">SaaS</div>
+              <div class="project-tag coral">AI · SaaS</div>
             </div>
             <div class="project-desc">Managed hosting platform for OpenClaw AI personal assistant — Indonesian-market SaaS with multi-provider VPS provisioning and web panel.</div>
             <div class="project-url">jarvisclaw.id →</div>
@@ -1187,10 +1211,29 @@
           <a href="https://hrdex.co" target="_blank" class="project-card animate-in d6" data-hover>
             <div class="project-header">
               <div class="project-name">HRDex</div>
-              <div class="project-tag coral">SaaS</div>
+              <div class="project-tag coral">Productivity</div>
             </div>
             <div class="project-desc">Chat-first HR self-service SaaS — employees manage leave, attendance, and payslips via WhatsApp and Telegram bots.</div>
             <div class="project-url">hrdex.co →</div>
+          </a>
+          <div class="project-card animate-in d7" data-hover>
+            <div class="project-header">
+              <div class="project-name">ToolzPad</div>
+              <div class="project-tag">Utilities</div>
+            </div>
+            <div class="project-desc">Everyday utility app for iOS & macOS — a collection of handy tools built with Swift, from text transforms to quick calculations.</div>
+            <div class="project-stores">
+              <a href="https://apps.apple.com/id/app/toolzpad/id6761078050" target="_blank" class="store-btn" data-hover>iOS App Store →</a>
+              <a href="https://apps.apple.com/us/app/toolzpad-desktop/id6761079394" target="_blank" class="store-btn" data-hover>Mac App Store →</a>
+            </div>
+          </div>
+          <a href="https://github.com/zaidysf/zclawd" target="_blank" class="project-card animate-in d8" data-hover>
+            <div class="project-header">
+              <div class="project-name">ZClawd</div>
+              <div class="project-tag coral">AI · Open Source</div>
+            </div>
+            <div class="project-desc">Always-on AI assistant powered by Claude Code — open-source OpenClaw alternative with Telegram, Pinecone memory, and auto-restart.</div>
+            <div class="project-url">github.com/zaidysf/zclawd →</div>
           </a>
         </div>
       </div>
