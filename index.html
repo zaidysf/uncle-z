@@ -729,6 +729,128 @@
       height: 16px;
     }
 
+    /* Contact form */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 520px;
+      text-align: left;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-field label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      outline: none;
+      transition: border-color 0.2s ease;
+      cursor: none;
+    }
+
+    .form-field textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+      border-color: var(--blue);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .form-submit {
+      padding: 12px 28px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      background: var(--text);
+      color: var(--bg);
+      border: 1px solid var(--text);
+      cursor: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-submit:hover:not(:disabled) {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+    }
+
+    .form-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .form-status {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      min-height: 18px;
+    }
+
+    .form-status.success {
+      color: var(--blue);
+    }
+
+    .form-status.error {
+      color: var(--coral);
+    }
+
+    .contact-secondary {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .contact-secondary a {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .contact-secondary a:hover {
+      color: var(--blue);
+    }
+
     /* Keyboard hint */
     .key-hint {
       position: fixed;
@@ -1061,6 +1183,10 @@
         width: 100%;
       }
 
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
       .contact-btn {
         width: 100%;
         justify-content: center;
@@ -1391,27 +1517,49 @@
         <div class="contact-content">
           <div class="section-label animate-in d1">Work with us</div>
           <h2 class="contact-title animate-in d2">Let's build<br>something great<span style="color:var(--coral)">.</span></h2>
-          <p class="contact-subtitle animate-in d3">uncle-z takes on select consulting, partnership, and collaboration work — and is also open to interesting tech leadership roles for its founder.</p>
-          <div class="contact-links animate-in d4">
-            <button class="contact-btn" data-hover onclick="goToSlide(0)" style="border-style:dashed;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="m15 18-6-6 6-6"/></svg>
-              Back to start
-            </button>
-            <a href="mailto:hello@uncle-z.com" class="contact-btn primary" data-hover>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              Email me
-            </a>
-            <a href="https://github.com/zaidysf" target="_blank" class="contact-btn" data-hover>
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          <p class="contact-subtitle animate-in d3">For consulting, partnerships, project inquiries, or just to say hi — drop us a line.</p>
+          <form class="contact-form animate-in d4" id="contactForm" onsubmit="return submitContactForm(event)">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="cf-name">Name</label>
+                <input type="text" id="cf-name" name="name" required data-hover>
+              </div>
+              <div class="form-field">
+                <label for="cf-email">Email</label>
+                <input type="email" id="cf-email" name="email" required data-hover>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="cf-topic">Topic</label>
+              <select id="cf-topic" name="topic" data-hover>
+                <option value="inquiry">Project inquiry</option>
+                <option value="consulting">Consulting</option>
+                <option value="partnership">Partnership</option>
+                <option value="hiring">Hiring / role</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" required data-hover placeholder="Tell us a bit about what you have in mind..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="form-submit" data-hover id="cfSubmit">Send message →</button>
+              <span class="form-status" id="cfStatus"></span>
+            </div>
+          </form>
+          <div class="contact-secondary animate-in d5">
+            <a href="https://github.com/zaidysf" target="_blank" data-hover>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
               GitHub
             </a>
-            <a href="https://linkedin.com/in/zaidysf" target="_blank" class="contact-btn" data-hover>
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            <a href="https://linkedin.com/in/zaidysf" target="_blank" data-hover>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               LinkedIn
             </a>
-            <a href="https://uncle-z.com" target="_blank" class="contact-btn" data-hover>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              Website
+            <a href="mailto:hello@uncle-z.com" data-hover>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              hello@uncle-z.com
             </a>
           </div>
         </div>
@@ -1695,6 +1843,72 @@
         expDetailList.innerHTML = data.points.map(p => `<li>${p}</li>`).join('');
       });
     });
+
+    // ==================
+    // Contact form
+    // ==================
+    const FEEDBACK_URL = 'https://feedback.uncle-z.com/v1/feedback';
+    const FEEDBACK_API_KEY = '4b0e0bf1f63188fb5590c4fa12a2efa605aaad4c582fb3f5b9e2a361cd4c358d';
+
+    async function submitContactForm(event) {
+      event.preventDefault();
+      const form = event.target;
+      const submitBtn = document.getElementById('cfSubmit');
+      const status = document.getElementById('cfStatus');
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const topic = form.topic.value;
+      const message = form.message.value.trim();
+
+      if (!name || !email || !message) {
+        status.textContent = 'Please fill in all required fields.';
+        status.className = 'form-status error';
+        return false;
+      }
+
+      const fd = new FormData();
+      fd.append('message', `[${topic}] from ${name}\n\n${message}`);
+      fd.append('email', email);
+      fd.append('metadata', JSON.stringify({ name, topic, source: 'uncle-z.com' }));
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      status.textContent = '';
+      status.className = 'form-status';
+
+      try {
+        const res = await fetch(FEEDBACK_URL, {
+          method: 'POST',
+          headers: {
+            'X-API-Key': FEEDBACK_API_KEY,
+            'X-Service': 'other'
+          },
+          body: fd
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server responded ${res.status}`);
+        }
+
+        status.textContent = 'Thanks — we\'ll get back to you soon.';
+        status.className = 'form-status success';
+        form.reset();
+        submitBtn.textContent = 'Sent ✓';
+        setTimeout(() => {
+          submitBtn.textContent = 'Send message →';
+          submitBtn.disabled = false;
+        }, 3000);
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Something went wrong. Try emailing hello@uncle-z.com.';
+        status.className = 'form-status error';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send message →';
+      }
+
+      return false;
+    }
   </script>
 </body>
 </html>
