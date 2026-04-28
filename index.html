@@ -323,6 +323,72 @@
       align-items: start;
     }
 
+    .founder-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .founder-side {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      padding-top: 8px;
+    }
+
+    .founder-block-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 14px;
+    }
+
+    .founder-companies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .founder-company {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 12px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      letter-spacing: 0.3px;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .founder-company:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .founder-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .founder-link {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s ease;
+    }
+
+    .founder-link:hover {
+      color: var(--blue);
+    }
+
     .exp-list {
       display: flex;
       flex-direction: column;
@@ -423,13 +489,13 @@
     /* ===================== */
     .projects-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 40px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 32px;
     }
 
     .project-card {
-      padding: 32px;
+      padding: 18px 20px;
       background: var(--bg-alt);
       border: 1px solid var(--border);
       text-decoration: none;
@@ -437,35 +503,38 @@
       transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
+      min-height: 130px;
     }
 
     .project-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-2px);
       border-color: var(--blue);
-      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.08);
     }
 
     .project-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
     }
 
     .project-name {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.3px;
     }
 
     .project-tag {
       font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 4px 10px;
+      font-size: 9px;
+      padding: 3px 8px;
       background: var(--blue-light);
       color: var(--blue);
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .project-tag.coral {
@@ -474,14 +543,15 @@
     }
 
     .project-desc {
-      font-size: 14px;
-      line-height: 1.7;
+      font-size: 12.5px;
+      line-height: 1.55;
       color: var(--text-muted);
+      flex: 1;
     }
 
     .project-url {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       color: var(--blue);
       letter-spacing: 0.3px;
       display: flex;
@@ -496,14 +566,14 @@
 
     .project-stores {
       display: flex;
-      gap: 10px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .store-btn {
       font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 5px 12px;
+      font-size: 10px;
+      padding: 4px 9px;
       background: var(--blue);
       color: #fff;
       text-decoration: none;
@@ -511,7 +581,7 @@
       transition: background 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     .store-btn:hover {
@@ -778,7 +848,8 @@
       }
 
       .about-layout,
-      .exp-layout {
+      .exp-layout,
+      .founder-layout {
         grid-template-columns: 1fr;
         gap: 32px;
       }
@@ -789,8 +860,8 @@
       }
 
       .projects-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
       }
 
       .stat-grid {
@@ -1055,9 +1126,9 @@
         <p class="hero-tagline animate-in d3">An independent product studio. Tools, AI, and SaaS — built and shipped by <a href="#" onclick="goToSlide(3); return false;" style="color:var(--blue); text-decoration:none; border-bottom:1px dashed var(--blue);" data-hover>Zaid Yasyaf</a> and team.</p>
         <span class="hero-greeting animate-in d4" style="color: var(--text-muted);">Jakarta, Indonesia · est. 2024</span>
         <div class="hero-links animate-in d4">
-          <a href="mailto:zaid.ug@gmail.com" class="hero-link" data-hover>
+          <a href="mailto:hello@uncle-z.com" class="hero-link" data-hover>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            zaid.ug@gmail.com
+            hello@uncle-z.com
           </a>
           <a href="https://github.com/zaidysf" class="hero-link" target="_blank" data-hover>
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -1072,10 +1143,6 @@
           <button class="hero-cta" data-hover onclick="if(onboardingDismissed) goToSlide(currentSlide + 1)">
             Explore →
           </button>
-          <a href="Zaid-Yasyaf-Resume.pdf" download class="hero-cta" data-hover style="background:var(--bg); color:var(--text); border:1px solid var(--border);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Resume
-          </a>
         </div>
       </div>
     </div>
@@ -1200,66 +1267,37 @@
     <!-- SLIDE 4: THE FOUNDER -->
     <div class="slide" data-slide="3">
       <div class="slide-content">
-        <div class="section-label animate-in d1">The founder</div>
-        <h2 class="section-title animate-in d2" style="margin-bottom: 24px;">Led by Zaid<span style="color:var(--coral)">.</span> Built by the team<span style="color:var(--coral)">.</span></h2>
-        <p class="about-text animate-in d3" style="max-width: 760px; margin-bottom: 32px;">uncle-z is led by <strong>Zaid Yasyaf</strong> — ex-Tokopedia, ex-Mekari, and ex-global tech companies, with 10+ years building production software across fintech, e-commerce, and SaaS. Zaid sets direction and architecture; a small, trusted team of engineers and designers ships every product alongside him.</p>
-        <div class="exp-layout animate-in d4">
-          <div class="exp-list" id="expList">
-            <div class="exp-item active" data-exp="0" data-hover>
-              <div class="exp-role">Tech Lead</div>
-              <div class="exp-company">Perqara</div>
-              <div class="exp-period">Jul 2022 — Present</div>
-            </div>
-            <div class="exp-item" data-exp="1" data-hover>
-              <div class="exp-role">Principal SDE</div>
-              <div class="exp-company">Denning IT Sdn Bhd</div>
-              <div class="exp-period">Jan 2021 — Jul 2022</div>
-            </div>
-            <div class="exp-item" data-exp="2" data-hover>
-              <div class="exp-role">SD Manager</div>
-              <div class="exp-company">PT Generasi Multi Indonusa</div>
-              <div class="exp-period">Mar 2020 — Sep 2020</div>
-            </div>
-            <div class="exp-item" data-exp="3" data-hover>
-              <div class="exp-role">Software Engineer</div>
-              <div class="exp-company">Tokopedia</div>
-              <div class="exp-period">Jan 2019 — Mar 2020</div>
-            </div>
-            <div class="exp-item" data-exp="4" data-hover>
-              <div class="exp-role">Software Engineer</div>
-              <div class="exp-company">Sleekr</div>
-              <div class="exp-period">Aug 2018 — Jan 2019</div>
-            </div>
-            <div class="exp-item" data-exp="5" data-hover>
-              <div class="exp-role">Software Engineer</div>
-              <div class="exp-company">UangTeman.com</div>
-              <div class="exp-period">Sep 2017 — Jul 2018</div>
-            </div>
-            <div class="exp-item" data-exp="6" data-hover>
-              <div class="exp-role">PHP Developer</div>
-              <div class="exp-company">PT Surya Anugrah Mulya</div>
-              <div class="exp-period">Jun 2016 — Aug 2017</div>
-            </div>
-            <div class="exp-item" data-exp="7" data-hover>
-              <div class="exp-role">Web Developer</div>
-              <div class="exp-company">AdisaniSoft</div>
-              <div class="exp-period">Jun 2015 — Jun 2016</div>
-            </div>
-            <div class="exp-item" data-exp="8" data-hover>
-              <div class="exp-role">Senior Web Developer</div>
-              <div class="exp-company">PT Empat Rantai Indonesia</div>
-              <div class="exp-period">Jun 2012 — Jun 2015</div>
-            </div>
+        <div class="founder-layout">
+          <div>
+            <div class="section-label animate-in d1">The founder</div>
+            <h2 class="section-title animate-in d2">Led by Zaid<span style="color:var(--coral)">.</span><br>Built by the team<span style="color:var(--coral)">.</span></h2>
+            <p class="about-text animate-in d3" style="margin-top: 24px;">uncle-z is led by <strong>Zaid Yasyaf</strong> — a Tech Lead with 10+ years shipping production software across fintech, e-commerce, and SaaS at companies like Tokopedia and Mekari.</p>
+            <p class="about-text animate-in d4" style="margin-top: 16px;">Zaid sets product direction and architecture. A small, trusted team of engineers and designers ships every product alongside him.</p>
           </div>
-          <div class="exp-detail-card" id="expDetail">
-            <div class="exp-detail-role" id="expDetailRole">Tech Lead</div>
-            <div class="exp-detail-meta" id="expDetailMeta">Perqara · Jul 2022 — Present · Jakarta, Indonesia</div>
-            <ul class="exp-detail-list" id="expDetailList">
-              <li>Directed <span class="exp-highlight">three technical squads</span>, driving collaboration and efficient delivery</li>
-              <li>Delivered company's <span class="exp-highlight">first successful public-facing products</span>, establishing product-focused culture</li>
-              <li>Optimized resource allocation, cutting operational costs by <span class="exp-highlight">20%</span></li>
-              <li>Hands-on coding, reducing development cycles by <span class="exp-highlight">30%</span></li>
-            </ul>
+          <div class="founder-side animate-in d4">
+            <div class="founder-block">
+              <div class="founder-block-label">Previously at</div>
+              <div class="founder-companies">
+                <span class="founder-company" data-hover>Tokopedia</span>
+                <span class="founder-company" data-hover>Mekari</span>
+                <span class="founder-company" data-hover>Perqara</span>
+                <span class="founder-company" data-hover>Denning IT</span>
+                <span class="founder-company" data-hover>UangTeman</span>
+              </div>
+            </div>
+            <div class="founder-block">
+              <div class="founder-block-label">Connect</div>
+              <div class="founder-links">
+                <a href="https://linkedin.com/in/zaidysf" target="_blank" class="founder-link" data-hover>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                  linkedin.com/in/zaidysf
+                </a>
+                <a href="https://github.com/zaidysf" target="_blank" class="founder-link" data-hover>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                  github.com/zaidysf
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1359,7 +1397,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="m15 18-6-6 6-6"/></svg>
               Back to start
             </button>
-            <a href="mailto:zaid.ug@gmail.com" class="contact-btn primary" data-hover>
+            <a href="mailto:hello@uncle-z.com" class="contact-btn primary" data-hover>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
               Email me
             </a>
