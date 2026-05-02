@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>uncle-z — independent product studio</title>
   <meta name="description" content="uncle-z is an independent product studio building tools, AI, and SaaS for Indonesian and global markets. Founded by Zaid Yasyaf.">
+  <link rel="icon" type="image/png" href="/AppIcon.png">
+  <link rel="apple-touch-icon" href="/AppIcon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -156,6 +158,33 @@
       font-weight: 600;
     }
 
+    /* Persistent "Hire us" CTA — top-left chrome, visible from every slide */
+    .hire-cta-fixed {
+      position: fixed;
+      top: 36px;
+      left: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--text);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      border-radius: 999px;
+      z-index: 100;
+      transition: background 0.25s ease, transform 0.2s ease;
+    }
+    .hire-cta-fixed:hover { background: var(--coral); transform: translateY(-1px); }
+    .hire-cta-fixed .arrow { transition: transform 0.2s ease; }
+    .hire-cta-fixed:hover .arrow { transform: translate(2px, -2px); }
+
+    @media (max-width: 768px) {
+      .hire-cta-fixed { top: 24px; left: 24px; padding: 6px 12px; font-size: 11px; }
+    }
+
     /* ===================== */
     /* SLIDE 1: HERO         */
     /* ===================== */
@@ -241,6 +270,18 @@
     .hero-cta:hover {
       background: var(--blue);
       transform: translateY(-1px);
+    }
+
+    /* Secondary CTA — outline-style sibling of .hero-cta */
+    .hero-cta.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--text);
+    }
+    .hero-cta.secondary:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
     }
 
     /* ===================== */
@@ -1229,6 +1270,11 @@
   <div class="cursor-dot" id="cursorDot"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
+  <!-- Persistent Hire-us CTA -->
+  <a href="https://book.uncle-z.com" class="hire-cta-fixed" data-hover>
+    Hire us <span class="arrow">↗</span>
+  </a>
+
   <!-- Slide Counter -->
   <div class="slide-counter">
     <span class="current" id="counterCurrent">01</span>
@@ -1269,6 +1315,9 @@
           <button class="hero-cta" data-hover onclick="if(onboardingDismissed) goToSlide(currentSlide + 1)">
             Explore →
           </button>
+          <a class="hero-cta secondary" data-hover href="https://book.uncle-z.com">
+            Hire us ↗
+          </a>
         </div>
       </div>
     </div>

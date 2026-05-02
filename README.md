@@ -1,176 +1,76 @@
-# Uncle Z's Portfolio
+# uncle-z.com
 
-A VS Code-inspired portfolio website built with Nuxt 3, featuring a modern tech stack and a sleek dark theme interface.
+The marketing site for **uncle-z** — an independent product studio shipping AI assistants, native apps, SaaS platforms, and developer tools, focused on Indonesian and global markets. Led by [Zaid Yasyaf](https://linkedin.com/in/zaidysf).
 
-## 🌟 Features
+> **Note for future contributors / AI assistants:** the site was previously a VS Code-inspired dark-theme portfolio (Nuxt 3) — that version is gone. The current site is a **6-slide keynote-style presentation** in a brutalist-editorial **light** theme. Don't trust older screenshots, READMEs, or memory snippets that describe the VS Code design.
 
-- 🎨 VS Code-inspired interface
-- 🌙 Dark theme
-- 📱 Responsive design
-- 🔄 Real-time GitHub integration
-- 📧 Contact form with Mailgun integration
-- 📄 PDF resume export
-- 🔍 SEO optimized
-- 🚀 Server-side rendering
+## Current design
 
-## 🛠 Tech Stack
+- **Theme:** light (white/cream background, near-black text)
+- **Accent:** orange (used on the trailing `.`, the `-` in `uncle-z`, and a few highlighted tags)
+- **Type:** sans-serif headlines (large, tight tracking), monospace for tags / labels / nav (`// UNCLE-Z STUDIO`, `01 / 06`, etc.)
+- **Layout:** 6 horizontal "slides", arrow-key (← →) navigation, slide counter top-right
+- **Aesthetic:** brutalist-editorial — generous whitespace, no decoration, typography-first
 
-- **Frontend Framework**: Vue.js 3 / Nuxt 3
-- **Styling**: TailwindCSS
-- **Language**: TypeScript
-- **Email Service**: Mailgun
-- **Deployment**: Vercel/Netlify
+## The 6 slides
 
-## 🚀 Getting Started
+1. **Hero** — wordmark, one-line studio pitch, contact links, "Explore →"
+2. **What we build** — `Products that solve real problems.` Studio one-liner + 4 stat cards (9+ Products, 30+ Projects, 10+ Years, ∞ Team) + tag row (`AI · SaaS · Native apps · E-commerce · Dev tools`)
+3. **What we ship** — 3×3 product grid (JarvisClaw, HRDex, HAKU, SplitEasy, ToolzPad, ZClawd, Quay, Skoru, Posz) — each card has name, category tag, blurb, outbound link
+4. **Led by Zaid. Built by the team.** — founder bio + "previously at" tags (Tokopedia, Mekari, Perqara, Denning IT, UangTeman) + Connect links
+5. **The studio stack.** — capabilities grouped by Languages / Databases / Cloud & DevOps / Frontend / Mobile / AI & ML / Domain Expertise
+6. **Let's build something great.** — contact form (name, email, topic dropdown, message) + GitHub / LinkedIn / `hello@uncle-z.com`
 
-### Prerequisites
+## Positioning
 
-- Node.js v20 or higher
-- npm or yarn
-- Git
+uncle-z is positioned as an **independent product studio** that:
+- Builds and ships its own SaaS / AI / mobile products (the 9 on slide 3)
+- Takes on consulting, partnerships, and project inquiries (slide 6 contact form)
 
-### Installation
+The 9 products under the umbrella are the studio's portfolio of bets. Some are run as standalone businesses on their own domains (`hrdex.co`, `jarvisclaw.id`, `hakuidn.com`, `quay.uncle-z.com`, etc.).
 
-1. Clone the repository
+## Tech stack (this site itself)
+
+- **Frontend:** Vue 3 / Nuxt 3
+- **Styling:** TailwindCSS
+- **Language:** TypeScript
+- **Email Service:** Mailgun (for the contact form)
+- **Deployment:** Vercel/Netlify
+
+## Running locally
+
 ```bash
 git clone https://github.com/zaidysf/unclez.git
 cd unclez
-```
-
-2. Install dependencies
-```bash
-npm install
-# or
-yarn install
-```
-
-3. Create environment file
-```bash
 cp .env.example .env
+# fill in MAILGUN_*, GITHUB_TOKEN_ONE, etc.
+npm install
+npm run dev
 ```
 
-4. Configure environment variables in `.env`:
+Visit `http://localhost:3000`.
+
+## Production build
+
+```bash
+npm run generate   # static site
+npm run preview    # local preview of the production build
+```
+
+## Environment variables
+
 ```env
-# GitHub API Tokens
-GITHUB_TOKEN_ONE=your_github_token_here
-GITHUB_TOKEN_TWO=your_github_token_here
-
-# Mailgun Configuration
-MAILGUN_DOMAIN=your_mailgun_domain_here
-MAILGUN_API_KEY=your_mailgun_api_key_here
-MAILGUN_FROM=noreply@uncle-z.com
-
-# Site Configuration
+GITHUB_TOKEN_ONE=...          # for the live GitHub stats on the studio page (if used)
+MAILGUN_DOMAIN=uncle-z.com
+MAILGUN_API_KEY=...
+MAILGUN_FROM=hello@uncle-z.com
 NUXT_PUBLIC_SITE_URL=https://uncle-z.com
 ```
 
-5. Run development server
-```bash
-npm run dev
-# or
-yarn dev
-```
+## License
 
-Visit `http://localhost:3000` to see the site.
+MIT.
 
-## 📦 Building for Production
+## Contact
 
-```bash
-# Generate static files
-npm run generate
-# or
-yarn generate
-
-# Preview production build
-npm run preview
-# or
-yarn preview
-```
-
-## 🌐 Deployment
-
-### Vercel
-
-1. Push your code to GitHub
-2. Import your repository in Vercel
-3. Configure environment variables
-4. Deploy
-
-### Netlify
-
-1. Push your code to GitHub
-2. Import your repository in Netlify
-3. Configure environment variables
-4. Deploy
-
-## 📁 Project Structure
-
-```
-unclez/
-├── components/        # Vue components
-├── pages/            # Application pages
-├── public/           # Static files
-│   ├── logos/        # Logo assets
-│   └── resume.pdf    # Downloadable resume
-├── server/           # Server-side code
-│   └── api/         # API endpoints
-├── app.vue           # App entry
-├── nuxt.config.ts    # Nuxt configuration
-└── package.json      # Project dependencies
-```
-
-## 🔧 Configuration
-
-### GitHub Integration
-
-1. Create a GitHub personal access token with the following permissions:
-   - `repo`
-   - `read:user`
-   - `user:email`
-
-2. Add the token to your environment variables:
-   ```env
-   GITHUB_TOKEN_ONE=your_token_here
-   ```
-
-### Mailgun Setup
-
-1. Create a Mailgun account
-2. Get your API key and domain
-3. Add to environment variables:
-   ```env
-   MAILGUN_DOMAIN=your_domain
-   MAILGUN_API_KEY=your_api_key
-   MAILGUN_FROM=noreply@your_domain
-   ```
-
-## 🎨 Customization
-
-### Themes
-
-The site uses a VS Code-inspired dark theme by default. Colors can be customized in:
-- `tailwind.config.js` for global theme colors
-- Individual component styles for specific customizations
-
-### Content
-
-Update your information in:
-- `components/ProfileTab.vue` for personal info
-- `components/ExperienceTab.vue` for work experience
-- `components/SkillsTab.vue` for skills
-- `components/EducationTab.vue` for education
-- `public/resume.pdf` for downloadable resume
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/zaidysf/unclez/issues).
-
-## 📧 Contact
-
-Zaid Yasyaf - [zaid.ug@gmail.com](mailto:zaid.ug@gmail.com)
-
-Project Link: [https://uncle-z.com](https://uncle-z.com)
+`hello@uncle-z.com` · [github.com/zaidysf](https://github.com/zaidysf) · [linkedin.com/in/zaidysf](https://linkedin.com/in/zaidysf)
