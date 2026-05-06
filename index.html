@@ -858,6 +858,32 @@
       color: var(--blue);
     }
 
+    .legal-links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-light);
+      letter-spacing: 0.02em;
+    }
+
+    .legal-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .legal-links a:hover {
+      color: var(--text);
+    }
+
+    .legal-links .sep {
+      opacity: 0.4;
+    }
+
     /* Keyboard hint */
     .key-hint {
       position: fixed;
@@ -1554,6 +1580,13 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
               hello@uncle-z.com
             </a>
+          </div>
+          <div class="legal-links animate-in d5">
+            <a href="/privacy.html" data-hover>Privacy</a>
+            <span class="sep">·</span>
+            <a href="/terms.html" data-hover>Terms</a>
+            <span class="sep">·</span>
+            <a href="/refund.html" data-hover>Refund</a>
           </div>
         </div>
       </div>
