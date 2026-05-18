@@ -1343,7 +1343,7 @@
   </div>
 
   <!-- Game Mode entry: discoverable HUD-style link -->
-  <a href="play.html" class="game-mode-entry" data-hover>
+  <a href="/play" class="game-mode-entry" data-hover>
     // PRESS <kbd>G</kbd> FOR GAME MODE
   </a>
 
@@ -1817,7 +1817,7 @@
         // Don't trigger if user is typing in an input
         if (activeEl && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName)) return;
         e.preventDefault();
-        window.location.href = 'play.html';
+        window.location.href = '/play';
         return;
       }
       if (!onboardingDismissed) {

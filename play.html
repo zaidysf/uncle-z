@@ -2069,7 +2069,7 @@
       // Build nav: billboard FIRST, then menu items
       const navItems = [billboard, ...mainMenuItems];
       hookMenu([
-        () => { playClick(); setTimeout(() => { window.location.href = 'arcade.html'; }, 250); },
+        () => { playClick(); setTimeout(() => { window.location.href = '/arcade'; }, 250); },
         () => navigateTo('products'),
         () => navigateTo('story'),
         () => navigateTo('capabilities'),
@@ -2087,7 +2087,7 @@
       // Mouse-click handler for billboard — launches Grand Theft Arcade
       billboard.addEventListener('click', () => {
         playClick();
-        setTimeout(() => { window.location.href = 'arcade.html'; }, 250);
+        setTimeout(() => { window.location.href = '/arcade'; }, 250);
       });
     }
 
