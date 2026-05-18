@@ -899,6 +899,73 @@
       letter-spacing: 0.5px;
     }
 
+    /* Game mode entry — discoverable HUD link, bottom-left */
+    .game-mode-entry {
+      position: fixed;
+      bottom: 40px;
+      left: 60px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-light);
+      z-index: 100;
+      letter-spacing: 1.5px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px dashed var(--border);
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .game-mode-entry::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--coral);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(249,115,22,0.6);
+      animation: gmePulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes gmePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .game-mode-entry:hover {
+      color: var(--text);
+      border-color: var(--coral);
+      background: var(--bg-alt);
+    }
+
+    .game-mode-entry kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 18px;
+      padding: 0 5px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      border-radius: 3px;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .game-mode-entry {
+        bottom: 12px;
+        left: 12px;
+        font-size: 9px;
+        padding: 4px 8px;
+      }
+    }
+
     .key-hint kbd {
       display: inline-flex;
       align-items: center;
@@ -1274,6 +1341,11 @@
   <div class="key-hint">
     <kbd>←</kbd><kbd>→</kbd> navigate
   </div>
+
+  <!-- Game Mode entry: discoverable HUD-style link -->
+  <a href="play.html" class="game-mode-entry" data-hover>
+    // PRESS <kbd>G</kbd> FOR GAME MODE
+  </a>
 
   <!-- Slides -->
   <div class="slides-wrapper">
@@ -1739,6 +1811,15 @@
     }
 
     document.addEventListener('keydown', (e) => {
+      // Game mode shortcut — works even before onboarding dismissed
+      if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const activeEl = document.activeElement;
+        // Don't trigger if user is typing in an input
+        if (activeEl && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName)) return;
+        e.preventDefault();
+        window.location.href = 'play.html';
+        return;
+      }
       if (!onboardingDismissed) {
         e.preventDefault();
         dismissOnboarding();

@@ -1,0 +1,3000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>uncle-z — GAME MODE</title>
+<meta name="description" content="uncle-z GAME MODE — an interactive studio menu. Press start.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Russo+One&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --rec-red: #ff3838;
+    --coral: #F97316;
+    --white: #fff;
+    --dim: rgba(255,255,255,0.45);
+    --hud: rgba(255,255,255,0.7);
+    --bg-dark: #0a1018;
+  }
+
+  html, body {
+    height:100%; width:100%;
+    overflow:hidden;
+    background: var(--bg-dark);
+    color: var(--white);
+    font-family: 'Russo One', sans-serif;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hide native cursor on devices with a pointer */
+  @media (hover: hover) and (pointer: fine) {
+    html, body, * {
+      cursor: none !important;
+    }
+  }
+
+  /* === Gaming cursor === */
+  .game-cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    width: 6px;
+    height: 6px;
+    background: var(--coral);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--coral), 0 0 4px #fff;
+    top: -50px;
+    left: -50px;
+    will-change: top, left;
+  }
+
+  .game-cursor-ring {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--coral);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    top: -50px;
+    left: -50px;
+    opacity: 0.7;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+    will-change: top, left;
+  }
+
+  .game-cursor-ring.hover {
+    width: 44px;
+    height: 44px;
+    border-color: var(--white);
+    border-width: 2px;
+    opacity: 1;
+    box-shadow: 0 0 16px rgba(255,255,255,0.4), 0 0 24px var(--coral);
+  }
+
+  /* Click pulse (separate temp element) */
+  .game-cursor-pulse {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9997;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--coral);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: cursorPulseAnim 0.5s ease-out forwards;
+  }
+
+  @keyframes cursorPulseAnim {
+    0%   { width: 24px; height: 24px; opacity: 1; }
+    100% { width: 80px; height: 80px; opacity: 0; }
+  }
+
+  /* Hide gaming cursor on touch devices */
+  @media (hover: none), (pointer: coarse) {
+    .game-cursor, .game-cursor-ring, .game-cursor-pulse { display: none; }
+  }
+
+  /* === Background video === */
+  .bg-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  .overlay {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 25%, transparent 60%, rgba(0,0,0,0.65) 100%),
+      radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.5) 100%);
+  }
+
+  .grain {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    animation: grainShift 0.18s steps(4) infinite;
+  }
+
+  @keyframes grainShift {
+    0%   { transform: translate(0,0); }
+    25%  { transform: translate(-3px,2px); }
+    50%  { transform: translate(2px,-3px); }
+    75%  { transform: translate(-1px,1px); }
+    100% { transform: translate(0,0); }
+  }
+
+  /* CRT scanlines for that game feel */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(255,255,255,0.02) 2px,
+      rgba(255,255,255,0.02) 3px
+    );
+    opacity: 0.6;
+  }
+
+  /* === Stage === */
+  .stage {
+    position: relative;
+    z-index: 3;
+    height: 100vh;
+    width: 100vw;
+    padding: 6vh 5vw;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  /* === Top bar / Header === */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--hud);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .breadcrumb .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--rec-red);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--rec-red);
+    animation: blink 1.4s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+
+  .top-right {
+    text-align: right;
+  }
+
+  .top-right .rec-time {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  /* === Main content area (flex column) === */
+  .main {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh 0 3vh 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(249, 115, 22, 0.4) transparent;
+  }
+
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-thumb {
+    background: rgba(249, 115, 22, 0.4);
+    border-radius: 3px;
+  }
+  .main::-webkit-scrollbar-track { background: transparent; }
+
+  /* Title block - top left, pushed up */
+  .title-block {
+    align-self: flex-start;
+    text-align: left;
+    max-width: 60%;
+  }
+
+  .scene-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--coral);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Content/menu - bottom right */
+  .right-content {
+    margin-top: auto;
+    max-width: 520px;
+    width: 100%;
+    align-self: flex-end;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 18px;
+  }
+
+  .right-content.wide {
+    max-width: 600px;
+  }
+
+  .right-content > p,
+  .right-content > .body-text {
+    text-align: right;
+    color: rgba(255,255,255,0.9);
+    font-family: 'Russo One', sans-serif;
+    font-size: clamp(14px, 1.15vw, 16px);
+    line-height: 1.7;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .right-content strong {
+    color: var(--coral);
+  }
+
+  /* External link icon */
+  .ext-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55em;
+    color: var(--coral);
+    margin-left: 6px;
+    vertical-align: middle;
+    display: inline-block;
+    font-style: normal;
+    letter-spacing: 0;
+  }
+
+  /* Capabilities — same Bungee italic language as menu items */
+  .skills-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  .skill-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+  }
+
+  .skill-group-label {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: clamp(16px, 1.8vw, 24px);
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1.1;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  .skill-items {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(11px, 0.9vw, 13px);
+    color: rgba(255,255,255,0.82);
+    letter-spacing: 0.3px;
+    line-height: 1.5;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  /* Contact list — same stat-block treatment as capabilities */
+  .contact-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px 24px;
+    align-items: baseline;
+    width: 100%;
+    text-align: left;
+  }
+
+  .contact-list .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--coral);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-align: right;
+    white-space: nowrap;
+    padding-top: 4px;
+  }
+
+  .contact-list a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.18s ease, transform 0.18s ease;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+  }
+
+  .contact-list a:hover {
+    color: var(--coral);
+    transform: translateX(4px);
+  }
+
+  /* Right-aligned chip-list */
+  .right-content .chip-list {
+    justify-content: flex-end;
+  }
+
+  /* === Game-style inquiry form === */
+  .game-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .form-field {
+    width: 100%;
+    max-width: 480px;
+    text-align: left;
+  }
+
+  .form-field label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--coral);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .game-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    border-radius: 0;
+    box-sizing: border-box;
+    cursor: text;
+  }
+
+  .game-input::placeholder {
+    color: rgba(255,255,255,0.32);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+
+  .game-input:focus {
+    border-color: var(--coral);
+    box-shadow: 0 0 0 1px var(--coral), 0 0 16px rgba(249, 115, 22, 0.25);
+  }
+
+  textarea.game-input {
+    resize: none;
+    min-height: 88px;
+    line-height: 1.5;
+  }
+
+  /* Field container — flex column so error badge can right-align */
+  .form-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Field error — white badge with red text */
+  .form-field .form-error {
+    display: none;
+    align-self: flex-end;
+    width: fit-content;
+    max-width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--rec-red);
+    background: #fff;
+    padding: 5px 10px 5px 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 6px;
+    position: relative;
+    box-shadow: 0 0 14px rgba(255, 56, 56, 0.4), 0 2px 8px rgba(0,0,0,0.3);
+    border: 1px solid var(--rec-red);
+    font-weight: 700;
+  }
+
+  .form-field .form-error::before {
+    content: '⚠';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+  }
+
+  .form-field .form-error {
+    margin-top: 4px;
+    padding: 4px 10px 4px 22px;
+    font-size: 9px;
+  }
+
+  .form-field.error .game-input,
+  .form-field.error .vk-trigger,
+  .form-field.error .game-stepper {
+    border-color: var(--rec-red);
+    box-shadow: 0 0 0 1px var(--rec-red), 0 0 14px rgba(255, 56, 56, 0.3);
+  }
+
+  .form-field.error .form-error {
+    display: block;
+    animation: errorShake 0.3s ease;
+  }
+
+  @keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-4px); }
+    75%      { transform: translateX(4px); }
+  }
+
+  /* Form status — readable badge */
+  .form-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    max-width: 480px;
+    width: fit-content;
+    align-self: flex-end;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: var(--coral);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    min-height: 22px;
+    margin-top: 4px;
+  }
+
+  .form-status.success {
+    color: #fff;
+    background: rgba(74, 222, 128, 0.85);
+    border-color: rgba(74, 222, 128, 1);
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.4);
+  }
+
+  .form-status.error {
+    color: var(--rec-red);
+    background: #fff;
+    border-color: var(--rec-red);
+    box-shadow: 0 0 16px rgba(255, 56, 56, 0.4);
+    font-weight: 700;
+  }
+
+  .menu-item.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  /* Active (keyboard-selected) state for form fields */
+  .vk-trigger.active,
+  .game-stepper.active {
+    border-color: var(--coral) !important;
+    box-shadow: 0 0 0 1px var(--coral), 0 0 18px rgba(249, 115, 22, 0.3);
+    background: rgba(249, 115, 22, 0.05);
+  }
+
+  /* Game stepper (replaces dropdown) */
+  .game-stepper {
+    position: relative;
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    user-select: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    min-height: 36px;
+  }
+
+  .game-stepper:hover { border-color: rgba(255,255,255,0.4); }
+
+  .stepper-arrow {
+    color: var(--coral);
+    cursor: pointer;
+    padding: 4px 10px;
+    font-size: 14px;
+    transition: transform 0.12s ease, color 0.12s ease;
+    user-select: none;
+  }
+
+  .stepper-arrow:hover {
+    transform: scale(1.25);
+    color: #fff;
+  }
+
+  .stepper-arrow.pulse {
+    animation: stepperPulse 0.25s ease;
+  }
+
+  @keyframes stepperPulse {
+    0%, 100% { transform: scale(1); color: var(--coral); }
+    50%      { transform: scale(1.4); color: #fff; }
+  }
+
+  .stepper-value {
+    flex: 1;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+  }
+
+  /* Keyboard nav hint pulse for steppers */
+  .game-stepper.active::after {
+    content: '◀ ▶';
+    position: absolute;
+    bottom: -16px;
+    right: 0;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--coral);
+    font-size: 8px;
+    letter-spacing: 4px;
+    opacity: 0.6;
+  }
+
+  /* === VK trigger (field that opens virtual keyboard) === */
+  .vk-trigger {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 36px;
+  }
+
+  .vk-trigger:hover { border-color: rgba(255,255,255,0.4); }
+
+  .vk-trigger-multiline { min-height: 64px; align-items: flex-start; }
+
+  .vk-trigger-value {
+    flex: 1;
+    word-break: break-word;
+    line-height: 1.5;
+    max-height: 88px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  .vk-trigger-value.placeholder {
+    color: rgba(255,255,255,0.32);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+  }
+
+  .vk-trigger-icon {
+    color: var(--coral);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* === Virtual keyboard modal === */
+  .vk-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.92) 100%);
+    backdrop-filter: blur(28px) saturate(1.1) brightness(0.55);
+    -webkit-backdrop-filter: blur(28px) saturate(1.1) brightness(0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  .vk-modal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  .vk-modal.show { display: flex; }
+
+  .vk-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 760px;
+    text-align: center;
+  }
+
+  .vk-label {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--coral);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .vk-display {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    color: var(--white);
+    font-size: 22px;
+    text-align: left;
+    min-height: 56px;
+    padding: 16px 18px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--coral);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6), 0 0 16px rgba(249, 115, 22, 0.18);
+    margin-bottom: 24px;
+    letter-spacing: 1.5px;
+    line-height: 1.4;
+    word-break: break-word;
+    max-height: 30vh;
+    overflow-y: auto;
+    text-transform: uppercase;
+  }
+
+  .vk-display .vk-placeholder {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 13px;
+  }
+
+  /* VK live validation */
+  .vk-validation {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin: -16px auto 18px;
+    min-height: 24px;
+    padding: 4px 12px;
+    transition: all 0.2s ease;
+    width: fit-content;
+  }
+
+  .vk-validation.hint {
+    color: rgba(255,255,255,0.45);
+    background: transparent;
+  }
+
+  .vk-validation.error {
+    color: var(--rec-red);
+    background: #fff;
+    border: 1px solid var(--rec-red);
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(255, 56, 56, 0.4);
+  }
+
+  .vk-validation.success {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid #4ade80;
+    font-weight: 700;
+  }
+
+  .vk-validation .vk-counter {
+    color: rgba(255,255,255,0.45);
+    margin-left: 8px;
+    font-weight: normal;
+  }
+
+  .vk-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 18px;
+    background: var(--coral);
+    vertical-align: -2px;
+    animation: vk-blink 1s steps(2) infinite;
+    margin-left: 2px;
+  }
+
+  @keyframes vk-blink { to { opacity: 0; } }
+
+  .vk-keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .vk-row {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+  }
+
+  .vk-key {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--white);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.18);
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease, box-shadow 0.12s ease;
+    user-select: none;
+  }
+
+  .vk-key:hover {
+    background: rgba(249, 115, 22, 0.2);
+    border-color: var(--coral);
+  }
+
+  .vk-key.active {
+    background: var(--coral);
+    color: #fff;
+    border-color: var(--coral);
+    box-shadow: 0 0 14px var(--coral);
+    transform: scale(0.92);
+  }
+
+  .vk-key.wide {
+    width: auto;
+    padding: 0 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .vk-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .vk-action {
+    padding: 12px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .vk-action:hover {
+    border-color: var(--coral);
+    color: var(--coral);
+  }
+
+  .vk-action.primary {
+    background: var(--coral);
+    border-color: var(--coral);
+    color: var(--white);
+  }
+
+  .vk-action.primary:hover {
+    background: #fff;
+    color: var(--coral);
+  }
+
+  .vk-action.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  @media (max-width: 768px) {
+    .vk-key { width: 30px; height: 38px; font-size: 13px; }
+    .vk-key.wide { padding: 0 12px; font-size: 10px; }
+    .vk-display { font-size: 14px; padding: 12px; }
+    .vk-actions { flex-wrap: wrap; }
+  }
+
+  .rec-line {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: -8px;
+  }
+
+  .rec-dot {
+    width: 22px;
+    height: 22px;
+    background: var(--rec-red);
+    border-radius: 50%;
+    box-shadow: 0 0 24px rgba(255,56,56,0.8), 0 0 6px rgba(255,56,56,1);
+    animation: blink 1.4s ease-in-out infinite;
+  }
+
+  .scene-title {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: clamp(56px, 9vw, 120px);
+    line-height: 0.9;
+    letter-spacing: -3px;
+    text-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  .scene-title .red { color: var(--rec-red); }
+  .scene-title .accent { color: var(--coral); }
+
+  .scene-subtitle {
+    font-family: 'Russo One', sans-serif;
+    font-size: clamp(13px, 1.4vw, 18px);
+    color: var(--white);
+    letter-spacing: 5px;
+    margin-top: 16px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+    text-transform: uppercase;
+  }
+
+  /* === Menu === */
+  .menu {
+    align-self: end;
+    justify-self: end;
+    text-align: right;
+  }
+
+  .menu.center {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .menu-item {
+    font-family: 'Bungee', cursive;
+    font-size: clamp(18px, 2vw, 28px);
+    color: var(--dim);
+    font-style: italic;
+    letter-spacing: 1px;
+    line-height: 1.25;
+    padding: 3px 0;
+    cursor: pointer;
+    transition: color 0.18s ease, transform 0.18s ease, text-shadow 0.18s ease;
+    position: relative;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  .menu-item:hover { color: var(--white); }
+
+  .menu-item.active {
+    color: var(--white);
+    transform: translateX(-10px);
+    text-shadow: 0 0 24px rgba(255,255,255,0.5), 0 4px 16px rgba(0,0,0,0.6);
+  }
+
+  .menu.center .menu-item.active {
+    transform: translateY(-4px);
+  }
+
+  .menu-item.active::after {
+    content: '◀';
+    position: absolute;
+    right: -32px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--rec-red);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6em;
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  .menu.center .menu-item.active::after {
+    right: auto;
+    left: -32px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; transform: translateY(-50%) translateX(6px); }
+  }
+
+  .menu-item .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.35em;
+    color: var(--coral);
+    margin-left: 12px;
+    padding: 3px 8px;
+    border: 1px solid var(--coral);
+    border-radius: 2px;
+    letter-spacing: 2px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    background: rgba(249, 115, 22, 0.08);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.15);
+  }
+
+  .menu-item .tag.tag-value {
+    text-transform: none;
+    font-size: 0.4em;
+    letter-spacing: 1px;
+  }
+
+  /* Featured menu item (e.g., Play Mini GT* 5) */
+  .menu-item.featured {
+    color: var(--white);
+    animation: featuredGlow 2.5s ease-in-out infinite;
+  }
+
+  .menu-item.featured:not(.active) {
+    color: var(--white);
+  }
+
+  @keyframes featuredGlow {
+    0%, 100% {
+      text-shadow: 0 0 22px rgba(255, 255, 255, 0.35), 0 0 12px rgba(249, 115, 22, 0.35);
+    }
+    50% {
+      text-shadow: 0 0 36px rgba(255, 255, 255, 0.75), 0 0 24px var(--coral);
+    }
+  }
+
+  /* "NEW" badge — pulsing red */
+  .menu-item .tag.tag-new {
+    background: var(--rec-red);
+    border-color: var(--rec-red);
+    color: #fff;
+    animation: pulseNew 1.4s ease-in-out infinite;
+    font-weight: 700;
+  }
+
+  @keyframes pulseNew {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 56, 56, 0.45); transform: scale(1); }
+    50%      { box-shadow: 0 0 20px rgba(255, 56, 56, 0.95); transform: scale(1.06); }
+  }
+
+  /* === GT* 5 featured game card (above the menu, right column) === */
+  .gta-billboard {
+    width: clamp(260px, 24vw, 340px);
+    align-self: flex-end;
+    padding: 16px 18px;
+    background: rgba(10, 16, 24, 0.82);
+    border: 2px solid var(--coral);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.22s ease;
+    animation: billboardPulse 2.6s ease-in-out infinite;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+
+  .gta-billboard:hover,
+  .gta-billboard.active {
+    transform: translateX(-4px) scale(1.03);
+  }
+
+  .gta-billboard.active {
+    animation: billboardActive 1.4s ease-in-out infinite;
+  }
+
+  @keyframes billboardPulse {
+    0%, 100% {
+      box-shadow: 0 0 18px rgba(249, 115, 22, 0.35), inset 0 0 0 1px rgba(0,0,0,0.5);
+    }
+    50% {
+      box-shadow: 0 0 36px rgba(249, 115, 22, 0.85), inset 0 0 0 1px rgba(0,0,0,0.5);
+    }
+  }
+
+  @keyframes billboardActive {
+    0%, 100% { box-shadow: 0 0 24px rgba(249, 115, 22, 0.65), 0 0 0 1px #fff inset; }
+    50%      { box-shadow: 0 0 48px var(--coral), 0 0 0 2px #fff inset; }
+  }
+
+  .gta-billboard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 3px);
+    pointer-events: none;
+  }
+
+  .gta-billboard-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--coral);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    position: relative;
+    animation: sparkleHeader 1.8s ease-in-out infinite;
+    font-weight: 700;
+  }
+
+  @keyframes sparkleHeader {
+    0%, 100% { text-shadow: 0 0 6px rgba(249,115,22,0.4); }
+    50%      { text-shadow: 0 0 16px rgba(249,115,22,0.9), 0 0 24px rgba(255, 223, 0, 0.4); }
+  }
+
+  .gta-billboard-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--rec-red);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--rec-red);
+    animation: blink 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .gta-billboard-title {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 0.95;
+    letter-spacing: -1.5px;
+    margin-bottom: 10px;
+    color: var(--white);
+    text-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    position: relative;
+  }
+
+  .gta-billboard-title .red { color: var(--rec-red); }
+
+  .gta-billboard-cta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+
+  .gta-billboard-warning {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--coral);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(249, 115, 22, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+  }
+
+  .gta-billboard-warning::before {
+    content: '⚠';
+    font-size: 11px;
+  }
+
+  .gta-billboard-arrow {
+    color: var(--coral);
+    font-size: 14px;
+    animation: gtaArrow 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes gtaArrow {
+    from { transform: translateX(0); }
+    to   { transform: translateX(6px); }
+  }
+
+  @media (max-width: 768px) {
+    .gta-billboard {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  /* === Hover descriptions / preview === */
+  .preview {
+    position: fixed;
+    bottom: 13vh;
+    left: 5vw;
+    right: 5vw;
+    z-index: 4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--hud);
+    letter-spacing: 1px;
+    line-height: 1.6;
+    min-height: 60px;
+    pointer-events: none;
+    text-align: left;
+    transition: opacity 0.2s ease;
+    max-width: 60%;
+  }
+
+  .preview .preview-tag {
+    color: var(--coral);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .preview .preview-text {
+    color: var(--white);
+  }
+
+  /* === Bottom bar === */
+  .bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--hud);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .bottom-bar kbd {
+    color: var(--white);
+    font-family: inherit;
+    background: rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin: 0 2px;
+  }
+
+  /* === Story / Content panels === */
+  .content-panel {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 60px;
+    height: 100%;
+  }
+
+  .content-text {
+    align-self: center;
+    max-width: 600px;
+  }
+
+  .content-text p {
+    font-family: 'Russo One', sans-serif;
+    font-size: clamp(15px, 1.4vw, 18px);
+    line-height: 1.8;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 18px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .content-text strong {
+    color: var(--coral);
+  }
+
+  .chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--white);
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .chip.coral {
+    color: var(--coral);
+    border-color: var(--coral);
+  }
+
+  /* === Skills grid === */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 40px;
+    align-self: center;
+  }
+
+  .skill-group h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--coral);
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .skill-group .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* === Contact === */
+  .contact-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-self: center;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--white);
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.18);
+    transition: color 0.18s ease, transform 0.18s ease;
+    letter-spacing: 1px;
+  }
+
+  .contact-link:hover {
+    color: var(--coral);
+    transform: translateX(8px);
+  }
+
+  .contact-link .label {
+    color: var(--coral);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    min-width: 80px;
+  }
+
+  /* === Boot loading screen (centered, game-style, blurred bg) === */
+  .boot {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.75) 100%);
+    backdrop-filter: blur(28px) saturate(1.1) brightness(0.7);
+    -webkit-backdrop-filter: blur(28px) saturate(1.1) brightness(0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    overflow: hidden;
+  }
+
+  /* Pixel-grid overlay for chunky 8-bit feel */
+  .boot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  .boot-loading { position: relative; z-index: 2; }
+
+  .boot.show { display: flex; }
+
+  .boot.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .boot-loading {
+    text-align: center;
+    width: min(92vw, 720px);
+  }
+
+  .boot-rec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--coral);
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .boot-rec-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--rec-red);
+    border-radius: 50%;
+    box-shadow: 0 0 16px var(--rec-red);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  .boot-title {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: clamp(44px, 8vw, 110px);
+    color: var(--white);
+    letter-spacing: -3px;
+    line-height: 1;
+    text-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 60px rgba(255,255,255,0.08);
+    margin-bottom: 48px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .boot-progress-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  /* Arcade-style parallelogram block progress bar */
+  .boot-progress {
+    flex: 1;
+    max-width: 480px;
+    height: 32px;
+    padding: 5px;
+    background: rgba(0,0,0,0.45);
+    border: 2px solid rgba(255,255,255,0.25);
+    display: flex;
+    gap: 4px;
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 0 1px rgba(0,0,0,0.6),
+      0 0 20px rgba(249, 115, 22, 0.12);
+  }
+
+  .boot-block {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    transform: skewX(-20deg);
+    transition: background 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .boot-block.filled {
+    background: var(--coral);
+    box-shadow:
+      0 0 8px rgba(249, 115, 22, 0.7),
+      inset 0 0 6px rgba(255,255,255,0.25);
+  }
+
+  .boot-block.filling {
+    animation: blockPulse 0.45s ease-out;
+  }
+
+  @keyframes blockPulse {
+    0%   { background: #fff; box-shadow: 0 0 14px #fff, 0 0 24px var(--coral); transform: skewX(-20deg) scaleY(1.15); }
+    100% { background: var(--coral); box-shadow: 0 0 8px rgba(249, 115, 22, 0.7), inset 0 0 6px rgba(255,255,255,0.25); transform: skewX(-20deg) scaleY(1); }
+  }
+
+  .boot-progress-percent {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--white);
+    letter-spacing: 2px;
+    min-width: 52px;
+    text-align: left;
+  }
+
+  .boot-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* Animated typing dots */
+  .dots-animated {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: baseline;
+    white-space: nowrap;
+    animation: dotsLoop 1.4s steps(4, end) infinite;
+    width: 0;
+  }
+  @keyframes dotsLoop {
+    to { width: 3ch; }
+  }
+
+  /* === Start overlay (same blurred backdrop as boot) === */
+  .start-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.75) 100%);
+    backdrop-filter: blur(28px) saturate(1.1) brightness(0.7);
+    -webkit-backdrop-filter: blur(28px) saturate(1.1) brightness(0.7);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 24px;
+    cursor: pointer;
+    transition: opacity 0.6s ease;
+    overflow: hidden;
+  }
+
+  .start-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  .start-overlay > * { position: relative; z-index: 2; }
+
+  .start-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .start-title {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: clamp(40px, 6vw, 80px);
+    letter-spacing: -2px;
+  }
+
+  .start-title span { color: var(--rec-red); }
+
+  .start-prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+
+  /* === Credits modal === */
+  .credits-modal {
+    position: fixed; inset: 0; z-index: 150;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .credits-modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .credits-box {
+    background: rgba(20,30,50,0.95);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 40px 48px;
+    max-width: 560px;
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .credits-box h3 {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    color: var(--coral);
+    font-size: 24px;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+
+  .credits-box p {
+    color: var(--white);
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  .credits-box a {
+    color: var(--coral);
+    text-decoration: underline;
+  }
+
+  .credits-box .close {
+    margin-top: 20px;
+    display: inline-block;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .credits-box .close:hover { color: var(--white); }
+
+  /* === Audio toggle === */
+  .audio-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid rgba(255,255,255,0.25);
+    cursor: pointer;
+    background: rgba(0,0,0,0.3);
+    transition: all 0.18s ease;
+  }
+  .audio-toggle:hover { color: var(--white); border-color: rgba(255,255,255,0.6); }
+
+  /* Scene transitions */
+  .scene { animation: sceneIn 0.4s ease both; }
+
+  @keyframes sceneIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === Rotate device prompt === */
+  .rotate-prompt {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.92) 100%);
+    backdrop-filter: blur(28px) saturate(1.1) brightness(0.5);
+    -webkit-backdrop-filter: blur(28px) saturate(1.1) brightness(0.5);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .rotate-prompt::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  .rotate-content {
+    position: relative;
+    z-index: 2;
+    max-width: 360px;
+    padding: 40px 32px;
+  }
+
+  .rotate-rec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--coral);
+    letter-spacing: 4px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  .rotate-rec-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--rec-red);
+    border-radius: 50%;
+    box-shadow: 0 0 14px var(--rec-red);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  .rotate-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 36px;
+    animation: rotateLoop 2.6s cubic-bezier(0.5, 0, 0.3, 1) infinite;
+    transform-origin: 50% 50%;
+  }
+
+  .rotate-icon rect {
+    stroke: var(--white);
+    stroke-width: 3;
+    fill: rgba(255,255,255,0.06);
+  }
+
+  .rotate-icon .screen {
+    fill: rgba(249, 115, 22, 0.18);
+  }
+
+  .rotate-icon .arrow {
+    stroke: var(--coral);
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @keyframes rotateLoop {
+    0%, 30%   { transform: rotate(0deg); }
+    55%, 75%  { transform: rotate(-90deg); }
+    100%      { transform: rotate(0deg); }
+  }
+
+  .rotate-title {
+    font-family: 'Bungee', cursive;
+    font-style: italic;
+    font-size: 32px;
+    color: var(--white);
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.7);
+  }
+
+  .rotate-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--coral);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  /* Show rotate prompt only on portrait mobile/tablet */
+  @media (orientation: portrait) and (max-width: 1024px) {
+    .rotate-prompt { display: flex; }
+    body > *:not(.rotate-prompt) { visibility: hidden; }
+    .bg-video { display: none; }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .stage { padding: 4vh 5vw; }
+    .main { grid-template-columns: 1fr; gap: 24px; }
+    .menu { justify-self: end; }
+    .content-panel { grid-template-columns: 1fr; gap: 24px; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .preview { display: none; }
+    .bottom-bar { font-size: 9px; }
+    .menu-item.active::after { right: -22px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Gaming cursor -->
+  <div class="game-cursor" id="gameCursor"></div>
+  <div class="game-cursor-ring" id="gameCursorRing"></div>
+
+  <!-- Rotate device prompt (portrait mobile only) -->
+  <div class="rotate-prompt" id="rotatePrompt">
+    <div class="rotate-content">
+      <div class="rotate-rec">
+        <span class="rotate-rec-dot"></span>
+        <span>LANDSCAPE REQUIRED</span>
+      </div>
+      <svg class="rotate-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Phone body -->
+        <rect x="35" y="12" width="30" height="76" rx="5"/>
+        <!-- Phone screen highlight -->
+        <rect class="screen" x="39" y="18" width="22" height="60" rx="2"/>
+        <!-- Speaker dot -->
+        <circle cx="50" cy="84" r="1.5" fill="rgba(255,255,255,0.6)"/>
+        <!-- Curved rotation arrow around phone -->
+        <path class="arrow" d="M 14 38 A 30 30 0 0 1 38 14"/>
+        <path class="arrow" d="M 38 14 L 32 12 M 38 14 L 36 20"/>
+      </svg>
+      <div class="rotate-title">ROTATE<br>YOUR DEVICE</div>
+    </div>
+  </div>
+
+  <!-- Boot loading screen (game-style centered) -->
+  <div class="boot" id="boot">
+    <div class="boot-loading">
+      <div class="boot-rec">
+        <span class="boot-rec-dot"></span>
+        <span>NOW LOADING</span>
+      </div>
+      <div class="boot-title">GAME MODE</div>
+      <div class="boot-progress-wrap">
+        <div class="boot-progress" id="bootProgress"></div>
+        <div class="boot-progress-percent" id="bootPercent">0%</div>
+      </div>
+      <div class="boot-status" id="bootStatus">INITIALIZING SYSTEM</div>
+    </div>
+  </div>
+
+  <!-- Background video & overlays -->
+  <video class="bg-video" id="bgVideo" muted loop playsinline preload="auto">
+    <source src="./assets/play/bg-video.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+  <div class="grain"></div>
+  <div class="scanlines"></div>
+
+  <!-- Main stage -->
+  <div class="stage" id="stage">
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="breadcrumb">
+        <span class="live-dot"></span>
+        <span id="breadcrumb">UNCLE-Z STUDIOS / MAIN MENU</span>
+      </div>
+      <div class="top-right">
+        <div class="rec-time"><span id="recTime">GAME 00:00:00</span></div>
+        <div style="margin-top:4px; opacity:0.7;">4K · 24FPS · ISO 400</div>
+      </div>
+    </div>
+
+    <!-- Main content (scene-rendered) -->
+    <div class="main" id="main">
+      <!-- rendered by JS -->
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div>
+        <div class="audio-toggle" id="audioToggle" style="display:inline-block;">♪ MUSIC: ON</div>
+        &nbsp;<span id="creditsBtn" style="cursor:pointer;text-decoration:underline;">[i] CREDITS</span>
+      </div>
+      <div>
+        <kbd>↑</kbd> <kbd>↓</kbd> NAVIGATE &nbsp;·&nbsp;
+        <kbd>↵</kbd> SELECT &nbsp;·&nbsp;
+        <kbd>ESC</kbd> BACK
+      </div>
+    </div>
+  </div>
+
+  <!-- Hover preview -->
+  <div class="preview" id="preview"></div>
+
+  <!-- Start overlay -->
+  <div class="start-overlay" id="startOverlay">
+    <div class="start-title"><span>●</span> PRESS START</div>
+  </div>
+
+  <!-- Virtual Keyboard modal -->
+  <div class="vk-modal" id="vkModal">
+    <div class="vk-content">
+      <div class="vk-label" id="vkLabel">// PLAYER NAME</div>
+      <div class="vk-display" id="vkDisplay"><span class="vk-cursor"></span></div>
+      <div class="vk-validation hint" id="vkValidation">// MIN 2 CHARS</div>
+      <div class="vk-keyboard" id="vkKeyboard"></div>
+      <div class="vk-actions">
+        <div class="vk-action" data-vk-action="cancel">CANCEL [ESC]</div>
+        <div class="vk-action primary" data-vk-action="done" id="vkDone">DONE [ENTER]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credits modal -->
+  <div class="credits-modal" id="creditsModal">
+    <div class="credits-box">
+      <h3>// CREDITS</h3>
+      <p><strong style="color:var(--coral);">Navigation SFX:</strong> Sound Effect by <a href="https://pixabay.com/users/lucadialessandro-25927643/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=288597" target="_blank">Luca Di Alessandro</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=288597" target="_blank">Pixabay</a>.</p>
+      <p><strong style="color:var(--coral);">Click SFX:</strong> Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6104" target="_blank">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6104" target="_blank">Pixabay</a>.</p>
+      <p><strong style="color:var(--coral);">Back SFX:</strong> Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=88355" target="_blank">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=88355" target="_blank">Pixabay</a>.</p>
+      <p><strong style="color:var(--coral);">Background music & video:</strong> AI-generated by Zaid Yasyaf / uncle-z.</p>
+      <p><strong style="color:var(--coral);">Design inspiration:</strong> <a href="https://www.instagram.com/reel/DYNJCe0ov3a/" target="_blank">this Instagram Reel</a> — the original "game-menu" treatment that sparked GAME MODE.</p>
+      <p><strong style="color:var(--coral);">Design & build:</strong> uncle-z studios, 2026.</p>
+      <span class="close" id="creditsClose">[CLOSE · ESC]</span>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="./assets/play/bg-music-low.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="navSound" preload="auto">
+    <source src="./assets/play/game-nav.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="startSound" preload="auto">
+    <source src="./assets/play/game-start.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="backSound" preload="auto">
+    <source src="./assets/play/back-button.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // ============================================
+    // SCENE DATA
+    // ============================================
+    const PRODUCTS = [
+      { name: 'JarvisClaw',  tag: 'AI · SaaS',          url: 'https://jarvisclaw.id',                     desc: 'Managed hosting platform for OpenClaw AI personal assistant — Indonesian-market SaaS with multi-provider VPS provisioning.' },
+      { name: 'HRDex',       tag: 'Productivity',       url: 'https://hrdex.co',                          desc: 'Chat-first HR self-service SaaS — employees manage leave, attendance, and payslips via WhatsApp and Telegram bots.' },
+      { name: 'HAKU',        tag: 'E-Commerce',         url: 'https://hakuidn.com',                       desc: "Women's fashion e-commerce — minimalist, European-inspired clothing brand with curated collections." },
+      { name: 'SplitEasy',   tag: 'Utilities',          url: 'https://spliteasy.uncle-z.com',             desc: 'Receipt-OCR bill splitter for iPhone, iPad, and Android — scan, tap to assign items, see who owes what.' },
+      { name: 'ToolzPad',    tag: 'Utilities',          url: 'https://apps.apple.com/id/app/toolzpad/id6761078050', desc: 'Everyday utility app for iOS & macOS — a collection of handy tools built natively with Swift.' },
+      { name: 'ZClawd',      tag: 'AI · Open Source',   url: 'https://github.com/zaidysf/zclawd',         desc: 'Always-on AI assistant powered by Claude Code — open-source OpenClaw alternative with Telegram and Pinecone memory.' },
+      { name: 'Quay',        tag: 'Dev Tools',          url: 'https://quay.uncle-z.com',                  desc: 'Native macOS database client — Postgres, MySQL/MariaDB, SQLite, MongoDB, Redis. Built with Tauri.' },
+      { name: 'Skoru',       tag: 'Sports · SaaS',      url: 'https://skoru.club',                        desc: 'Live scoreboard SaaS for amateur and recreational sports — real-time scoring via mobile or web with shareable live links.' },
+      { name: 'Posz',        tag: 'F&B · POS',          url: 'https://posz.uncle-z.com',                  desc: 'Restaurant and cafe POS — tablet-first Flutter app, Next.js back-office, Go API. QRIS-first, IDR, PPN 11%.' }
+    ];
+
+    const SKILLS = [
+      { group: 'Languages',        items: ['PHP / Laravel','TypeScript','Node.js','Go','Swift','Dart'] },
+      { group: 'Databases',        items: ['MySQL','PostgreSQL','Redis','MongoDB','ElasticSearch','OpenSearch'] },
+      { group: 'Cloud & DevOps',   items: ['AWS','GCP','Docker','Kubernetes','Grafana'] },
+      { group: 'Frontend',         items: ['React','Vue.js','Nuxt','Next.js','TailwindCSS','Inertia.js','tRPC'] },
+      { group: 'Mobile / Native',  items: ['Flutter','React Native','SwiftUI','Tauri'] },
+      { group: 'AI & ML',          items: ['LLM Integration','RAG','AI Agents','Vector DBs','Claude API','OpenAI API'] },
+      { group: 'Domain',           items: ['SaaS','Fintech','E-Commerce','POS','Productivity','Sports'] }
+    ];
+
+    // ============================================
+    // STATE
+    // ============================================
+    const stage = document.getElementById('stage');
+    const mainEl = document.getElementById('main');
+    const bgVideo = document.getElementById('bgVideo');
+    const previewEl = document.getElementById('preview');
+    const breadcrumbEl = document.getElementById('breadcrumb');
+    const bgMusic = document.getElementById('bgMusic');
+    const navSound = document.getElementById('navSound');
+    const startSound = document.getElementById('startSound');
+    const backSound = document.getElementById('backSound');
+    const startOverlay = document.getElementById('startOverlay');
+    const audioToggle = document.getElementById('audioToggle');
+    const boot = document.getElementById('boot');
+    const creditsModal = document.getElementById('creditsModal');
+    const creditsBtn = document.getElementById('creditsBtn');
+    const creditsClose = document.getElementById('creditsClose');
+
+    bgMusic.volume = 0.35;
+    navSound.volume = 0.55;
+    startSound.volume = 0.65;
+    backSound.volume = 0.6;
+
+    let started = false;
+    let bootInProgress = false;
+    let musicOn = true;
+    let currentScene = 'main';
+    let currentIndex = 0;
+    let sceneStack = [];
+
+    // ============================================
+    // SOUND
+    // ============================================
+    function playNav() {
+      if (!started) return;
+      navSound.currentTime = 0;
+      navSound.play().catch(()=>{});
+    }
+    function playClick() {
+      if (!started) return;
+      startSound.currentTime = 0;
+      startSound.play().catch(()=>{});
+    }
+    function playBack() {
+      if (!started) return;
+      backSound.currentTime = 0;
+      backSound.play().catch(()=>{});
+    }
+
+    // ============================================
+    // BOOT
+    // ============================================
+    function runBoot() {
+      bootInProgress = true;
+      boot.classList.add('show');
+      const statusEl = document.getElementById('bootStatus');
+      const progressEl = document.getElementById('bootProgress');
+      const percentEl = document.getElementById('bootPercent');
+
+      const TOTAL_BLOCKS = 20;
+
+      // Build the block bar
+      progressEl.innerHTML = '';
+      for (let i = 0; i < TOTAL_BLOCKS; i++) {
+        const block = document.createElement('div');
+        block.className = 'boot-block';
+        progressEl.appendChild(block);
+      }
+      const blocks = progressEl.querySelectorAll('.boot-block');
+
+      const steps = [
+        'INITIALIZING SYSTEM',
+        'LOADING STUDIO MODULE',
+        'MOUNTING PRODUCT REGISTRY',
+        '9 PRODUCTS DETECTED',
+        'AUDIO SUBSYSTEM',
+        'SHADER COMPILATION',
+        'READY'
+      ];
+
+      const totalDuration = 6500;
+      // Fill blocks at a steady pace independent of step changes
+      const blockInterval = totalDuration / TOTAL_BLOCKS;
+      const stepDuration = totalDuration / steps.length;
+
+      // Fill blocks one by one
+      for (let i = 0; i < TOTAL_BLOCKS; i++) {
+        setTimeout(() => {
+          blocks[i].classList.add('filling');
+          setTimeout(() => {
+            blocks[i].classList.remove('filling');
+            blocks[i].classList.add('filled');
+          }, 400);
+          const pct = Math.round(((i + 1) / TOTAL_BLOCKS) * 100);
+          percentEl.textContent = pct + '%';
+        }, i * blockInterval);
+      }
+
+      // Status text cycles through steps
+      steps.forEach((step, i) => {
+        setTimeout(() => {
+          statusEl.textContent = step;
+        }, i * stepDuration);
+      });
+
+      setTimeout(() => {
+        // Start the background video right as the boot starts to fade
+        bgVideo.currentTime = 0;
+        bgVideo.play().catch(()=>{});
+        boot.classList.add('hidden');
+        setTimeout(() => {
+          boot.style.display = 'none';
+          bootInProgress = false;
+        }, 600);
+      }, totalDuration);
+    }
+
+    // ============================================
+    // SCENES
+    // ============================================
+    function setBreadcrumb(path) {
+      breadcrumbEl.textContent = path;
+    }
+
+    function setPreview(html) {
+      previewEl.innerHTML = html || '';
+    }
+
+    // ----- MAIN MENU -----
+    function renderMain() {
+      currentScene = 'main';
+      setBreadcrumb('UNCLE-Z STUDIOS / MAIN MENU');
+      setPreview('');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="rec-line">
+            <div class="rec-dot"></div>
+            <div class="scene-title"><span class="red">GAME</span></div>
+          </div>
+          <div class="scene-title">MODE</div>
+          <div class="scene-subtitle">UNCLE-Z STUDIOS · EST 2024</div>
+        </div>
+        <div class="right-content scene">
+          <div class="gta-billboard" id="gtaBillboard" data-hover>
+            <div class="gta-billboard-header">
+              <span class="gta-billboard-dot"></span>
+              <span>★ FUN GAMES ★</span>
+            </div>
+            <div class="gta-billboard-title"><span class="red">GT*</span> FIVE</div>
+            <div class="gta-billboard-cta">
+              <span>PLAY NOW</span>
+              <span class="gta-billboard-arrow">▶</span>
+            </div>
+            <div class="gta-billboard-warning">
+              Computer only · Keyboard + Mouse
+            </div>
+          </div>
+          <div class="menu" id="menuList">
+            <div class="menu-item" data-action="products">PRODUCTS <span class="tag">9 SHIPPED</span></div>
+            <div class="menu-item" data-action="story">STORY MODE</div>
+            <div class="menu-item" data-action="capabilities">CAPABILITIES</div>
+            <div class="menu-item" data-action="contact">WORK WITH US</div>
+            <div class="menu-item" data-action="exit">EXIT GAME MODE <span class="tag">↩</span></div>
+          </div>
+        </div>
+      `;
+      const billboard = mainEl.querySelector('#gtaBillboard');
+      const mainMenuItems = mainEl.querySelectorAll('.menu-item');
+      // Build nav: billboard FIRST, then menu items
+      const navItems = [billboard, ...mainMenuItems];
+      hookMenu([
+        () => { playClick(); setTimeout(() => { window.location.href = 'arcade.html'; }, 250); },
+        () => navigateTo('products'),
+        () => navigateTo('story'),
+        () => navigateTo('capabilities'),
+        () => navigateTo('contact'),
+        () => { playBack(); setTimeout(() => window.location.href = '/', 400); }
+      ], [
+        { tag: 'GT* 5 · BETA', text: 'Launch Grand Theft Arcade — top-down city sandbox. Press Enter to play.' },
+        { tag: 'PRODUCTS', text: '9 live and in-development products across AI, SaaS, native apps, and developer tools.' },
+        { tag: 'STORY MODE', text: 'Meet Zaid Yasyaf — the founder behind uncle-z. Ex-Tokopedia, ex-Mekari, 10+ years building software.' },
+        { tag: 'CAPABILITIES', text: 'The full studio stack: languages, databases, cloud, mobile, AI/ML. What we build with.' },
+        { tag: 'WORK WITH US', text: 'Project inquiries, consulting, partnerships, or just say hi.' },
+        { tag: 'EXIT', text: 'Return to uncle-z.com main site.' }
+      ], navItems);
+
+      // Mouse-click handler for billboard — launches Grand Theft Arcade
+      billboard.addEventListener('click', () => {
+        playClick();
+        setTimeout(() => { window.location.href = 'arcade.html'; }, 250);
+      });
+    }
+
+    // ----- GT* 5 (coming soon, surprise) -----
+    function renderMiniGta() {
+      currentScene = 'minigta';
+      setBreadcrumb('UNCLE-Z STUDIOS / GT* 5');
+      setPreview('');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="scene-title"><span class="red">GT*</span></div>
+          <div class="scene-title"><span class="accent">FIVE<span style="color:var(--coral)">.</span></span></div>
+          <div class="scene-subtitle">COMING SOON · IN DEVELOPMENT</div>
+        </div>
+        <div class="right-content scene">
+          <p>An <strong>open-world action experience</strong> — built from scratch by uncle-z studios.</p>
+          <p>Browser-native. WebGL. Pure chaos. Currently being assembled in a dark studio at 3am.</p>
+          <div class="chip-list">
+            <span class="chip">▶ Playable in browser</span>
+            <span class="chip">Single-player</span>
+            <span class="chip">WebGL</span>
+            <span class="chip">In development</span>
+          </div>
+          <div class="menu" id="menuList" style="margin-top:16px;">
+            <div class="menu-item" data-action="waitlist">JOIN WAITLIST <span class="tag tag-new">NOTIFY ME</span></div>
+            <div class="menu-item" data-action="back" style="margin-top:12px;font-size:0.7em;color:var(--coral);">◀ BACK</div>
+          </div>
+        </div>
+      `;
+      hookMenu([
+        () => navigateTo('contact'),
+        () => goBack()
+      ], [
+        { tag: 'JOIN WAITLIST', text: 'Get notified the moment GT* 5 goes live. Drops you to the inquiry form.' },
+        { tag: 'BACK', text: 'Return to main menu.' }
+      ]);
+    }
+
+    // ----- PRODUCTS -----
+    function renderProducts() {
+      currentScene = 'products';
+      setBreadcrumb('UNCLE-Z STUDIOS / PRODUCTS');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="scene-title"><span class="accent">PRODUCTS<span style="color:var(--coral)">.</span></span></div>
+          <div class="scene-subtitle">9 PROJECTS · LIVE &amp; IN DEV</div>
+        </div>
+        <div class="right-content scene">
+          <div class="menu" id="menuList">
+            ${PRODUCTS.map((p, i) => `
+              <div class="menu-item" data-index="${i}" data-action="product:${i}">${p.name.toUpperCase()} <span class="tag">${p.tag}</span><span class="ext-icon">↗</span></div>
+            `).join('')}
+            <div class="menu-item" data-action="back" style="margin-top:12px;font-size:0.7em;color:var(--coral);">◀ BACK</div>
+          </div>
+        </div>
+      `;
+      const handlers = PRODUCTS.map((p, i) => () => {
+        playClick();
+        setTimeout(() => window.open(p.url, '_blank', 'noopener,noreferrer'), 250);
+      });
+      handlers.push(() => goBack());
+      const previews = PRODUCTS.map(p => ({ tag: `${p.name} · ${p.tag}`, text: `${p.desc}  →  ${p.url}` }));
+      previews.push({ tag: 'BACK', text: 'Return to main menu.' });
+      hookMenu(handlers, previews);
+    }
+
+    // ----- STORY MODE (founder) -----
+    function renderStory() {
+      currentScene = 'story';
+      setBreadcrumb('UNCLE-Z STUDIOS / STORY MODE');
+      setPreview('');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="scene-title"><span class="accent">ZAID<span style="color:var(--coral)">.</span></span></div>
+          <div class="scene-subtitle">LED BY ZAID · BUILT BY THE TEAM</div>
+        </div>
+        <div class="right-content scene">
+          <p>uncle-z is led by <strong>Zaid Yasyaf</strong> — a Tech Lead with 10+ years shipping production software across fintech, e-commerce, and SaaS.</p>
+          <p>Previously at companies like <strong>Tokopedia</strong> and <strong>Mekari</strong>. Zaid sets product direction and architecture; a small, trusted team of engineers and designers ships every product alongside him.</p>
+          <div class="chip-list">
+            <span class="chip">Tokopedia</span>
+            <span class="chip">Mekari</span>
+            <span class="chip">Perqara</span>
+            <span class="chip">Denning IT</span>
+            <span class="chip">UangTeman</span>
+          </div>
+          <div class="menu" id="menuList" style="margin-top:16px;">
+            <div class="menu-item" data-action="linkedin">LINKEDIN <span class="tag">PROFILE</span><span class="ext-icon">↗</span></div>
+            <div class="menu-item" data-action="github">GITHUB <span class="tag">CODE</span><span class="ext-icon">↗</span></div>
+            <div class="menu-item" data-action="back" style="margin-top:12px;font-size:0.7em;color:var(--coral);">◀ BACK</div>
+          </div>
+        </div>
+      `;
+      hookMenu([
+        () => { playClick(); setTimeout(() => window.open('https://linkedin.com/in/zaidysf','_blank','noopener,noreferrer'), 250); },
+        () => { playClick(); setTimeout(() => window.open('https://github.com/zaidysf','_blank','noopener,noreferrer'), 250); },
+        () => goBack()
+      ], [
+        { tag: 'LINKEDIN', text: 'linkedin.com/in/zaidysf' },
+        { tag: 'GITHUB', text: 'github.com/zaidysf' },
+        { tag: 'BACK', text: 'Return to main menu.' }
+      ]);
+    }
+
+    // ----- CAPABILITIES -----
+    function renderCapabilities() {
+      currentScene = 'capabilities';
+      setBreadcrumb('UNCLE-Z STUDIOS / CAPABILITIES');
+      setPreview('');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="scene-title"><span class="accent">STACK<span style="color:var(--coral)">.</span></span></div>
+          <div class="scene-subtitle">THE STUDIO LOADOUT</div>
+        </div>
+        <div class="right-content wide scene">
+          <div class="skills-compact">
+            ${SKILLS.map(s => `
+              <div class="skill-row">
+                <div class="skill-group-label">${s.group.toUpperCase()}</div>
+                <div class="skill-items">${s.items.join(' · ')}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="menu" id="menuList" style="margin-top:16px;">
+            <div class="menu-item" data-action="back" style="font-size:0.7em;color:var(--coral);">◀ BACK</div>
+          </div>
+        </div>
+      `;
+      hookMenu([() => goBack()], [{ tag: 'BACK', text: 'Return to main menu.' }]);
+    }
+
+    // ----- CONTACT -----
+    function renderContact() {
+      currentScene = 'contact';
+      setBreadcrumb('UNCLE-Z STUDIOS / WORK WITH US');
+      setPreview('');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="scene-title"><span class="accent">CONTACT<span style="color:var(--coral)">.</span></span></div>
+          <div class="scene-subtitle">LET'S BUILD SOMETHING</div>
+        </div>
+        <div class="right-content scene">
+          <p>For consulting, partnerships, project inquiries, or just to say hi — drop us a line.</p>
+          <div class="menu" id="menuList" style="margin-top:16px;">
+            <div class="menu-item" data-action="email">EMAIL <span class="tag tag-value">hello@uncle-z.com</span></div>
+            <div class="menu-item" data-action="linkedin">LINKEDIN <span class="tag tag-value">/in/zaidysf</span><span class="ext-icon">↗</span></div>
+            <div class="menu-item" data-action="github">GITHUB <span class="tag tag-value">@zaidysf</span><span class="ext-icon">↗</span></div>
+            <div class="menu-item" data-action="form">INQUIRY FORM <span class="tag tag-value">uncle-z.com</span></div>
+            <div class="menu-item" data-action="back" style="margin-top:12px;font-size:0.7em;color:var(--coral);">◀ BACK</div>
+          </div>
+        </div>
+      `;
+      hookMenu([
+        () => { playClick(); setTimeout(() => window.location.href = 'mailto:hello@uncle-z.com', 250); },
+        () => { playClick(); setTimeout(() => window.open('https://linkedin.com/in/zaidysf','_blank','noopener,noreferrer'), 250); },
+        () => { playClick(); setTimeout(() => window.open('https://github.com/zaidysf','_blank','noopener,noreferrer'), 250); },
+        () => navigateTo('inquiry'),
+        () => goBack()
+      ], [
+        { tag: 'EMAIL', text: 'hello@uncle-z.com — drop a line, we read every one.' },
+        { tag: 'LINKEDIN', text: 'linkedin.com/in/zaidysf — connect on LinkedIn.' },
+        { tag: 'GITHUB', text: 'github.com/zaidysf — check out the open source work.' },
+        { tag: 'INQUIRY FORM', text: 'Open the in-game inquiry form to send us a detailed message.' },
+        { tag: 'BACK', text: 'Return to main menu.' }
+      ]);
+    }
+
+    // ----- INQUIRY FORM (in-game with virtual keyboard) -----
+    function renderInquiry() {
+      currentScene = 'inquiry';
+      setBreadcrumb('UNCLE-Z STUDIOS / WORK WITH US / INQUIRY');
+      setPreview('');
+      mainEl.innerHTML = `
+        <div class="title-block scene">
+          <div class="scene-title"><span class="accent">INQUIRY<span style="color:var(--coral)">.</span></span></div>
+          <div class="scene-subtitle">SEND US A MESSAGE</div>
+        </div>
+        <div class="right-content scene">
+          <form class="game-form" id="inquiryForm" novalidate>
+            <div class="form-field" data-field="name">
+              <label>Player Name</label>
+              <div class="vk-trigger" data-input="name" data-placeholder="Click to enter name" data-hover>
+                <span class="vk-trigger-value placeholder">Click to enter name</span>
+                <span class="vk-trigger-icon">✎</span>
+              </div>
+              <input type="hidden" name="name" value="">
+              <div class="form-error">// Player name required</div>
+            </div>
+
+            <div class="form-field" data-field="email">
+              <label>Contact Channel</label>
+              <div class="vk-trigger" data-input="email" data-placeholder="Click to enter email" data-hover>
+                <span class="vk-trigger-value placeholder">Click to enter email</span>
+                <span class="vk-trigger-icon">✎</span>
+              </div>
+              <input type="hidden" name="email" value="">
+              <div class="form-error">// Valid email required</div>
+            </div>
+
+            <div class="form-field" data-field="topic">
+              <label>Mission Type</label>
+              <div class="game-stepper" data-hover>
+                <span class="stepper-arrow" data-step="prev">◀</span>
+                <span class="stepper-value">Project Inquiry</span>
+                <span class="stepper-arrow" data-step="next">▶</span>
+              </div>
+              <input type="hidden" name="topic" value="inquiry">
+            </div>
+
+            <div class="form-field" data-field="message">
+              <label>Briefing</label>
+              <div class="vk-trigger vk-trigger-multiline" data-input="message" data-placeholder="Click to type your message" data-hover>
+                <span class="vk-trigger-value placeholder">Click to type your message</span>
+                <span class="vk-trigger-icon">✎</span>
+              </div>
+              <input type="hidden" name="message" value="">
+              <div class="form-error">// Message too short (min 10 chars)</div>
+            </div>
+
+            <div class="form-status" id="ifStatus" style="display:none;"></div>
+          </form>
+          <div class="menu" id="menuList" style="margin-top:8px;">
+            <div class="menu-item" data-action="submit" id="ifSubmit">SEND MESSAGE <span class="ext-icon">→</span></div>
+            <div class="menu-item" data-action="back" style="margin-top:12px;font-size:0.7em;color:var(--coral);">◀ BACK</div>
+          </div>
+        </div>
+      `;
+
+      // Wire VK triggers
+      const nameField = mainEl.querySelector('.vk-trigger[data-input="name"]');
+      const emailField = mainEl.querySelector('.vk-trigger[data-input="email"]');
+      const messageField = mainEl.querySelector('.vk-trigger[data-input="message"]');
+      [nameField, emailField, messageField].forEach(trigger => {
+        if (!trigger) return;
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openVK(trigger);
+        });
+      });
+
+      // Wire stepper
+      const stepperEl = mainEl.querySelector('.game-stepper');
+      const TOPIC_OPTIONS = [
+        { value: 'inquiry',     label: 'Project Inquiry' },
+        { value: 'consulting',  label: 'Consulting' },
+        { value: 'partnership', label: 'Partnership' },
+        { value: 'hiring',      label: 'Hiring / Role' },
+        { value: 'other',       label: 'Other' }
+      ];
+      initGameStepper(stepperEl, TOPIC_OPTIONS);
+
+      // Build nav targets — all 6 fields + buttons (arrow nav like a game menu)
+      const submitBtn = mainEl.querySelector('[data-action="submit"]');
+      const backBtn   = mainEl.querySelector('[data-action="back"]');
+      const navItems = [nameField, emailField, stepperEl, messageField, submitBtn, backBtn];
+
+      hookMenu([
+        () => openVK(nameField),
+        () => openVK(emailField),
+        () => stepperEl._cycleNext(),  // Enter on stepper cycles next (L/R also work)
+        () => openVK(messageField),
+        () => submitInquiry(),
+        () => goBack()
+      ], [
+        { tag: 'PLAYER NAME',     text: 'Press Enter to open the virtual keyboard and type your name.' },
+        { tag: 'CONTACT CHANNEL', text: 'Press Enter to enter your email address.' },
+        { tag: 'MISSION TYPE',    text: 'Press ← or → to cycle options. Enter advances forward.' },
+        { tag: 'BRIEFING',        text: 'Press Enter to type your message in the virtual keyboard.' },
+        { tag: 'SEND',            text: 'Submit the inquiry — we get a Telegram ping immediately.' },
+        { tag: 'BACK',            text: 'Return to Work With Us menu.' }
+      ], navItems);
+    }
+
+    // Stepper init — cycle option labels in place (no dropdown popup)
+    function initGameStepper(stepperEl, options) {
+      const valueEl = stepperEl.querySelector('.stepper-value');
+      const hiddenInput = stepperEl.closest('.form-field').querySelector('input[type="hidden"]');
+      let idx = Math.max(0, options.findIndex(o => o.value === hiddenInput.value));
+
+      function update() {
+        valueEl.textContent = options[idx].label;
+        hiddenInput.value = options[idx].value;
+        playNav();
+      }
+
+      stepperEl._cyclePrev = () => {
+        idx = (idx - 1 + options.length) % options.length;
+        stepperEl.querySelector('[data-step="prev"]').classList.add('pulse');
+        setTimeout(() => stepperEl.querySelector('[data-step="prev"]').classList.remove('pulse'), 250);
+        update();
+      };
+      stepperEl._cycleNext = () => {
+        idx = (idx + 1) % options.length;
+        stepperEl.querySelector('[data-step="next"]').classList.add('pulse');
+        setTimeout(() => stepperEl.querySelector('[data-step="next"]').classList.remove('pulse'), 250);
+        update();
+      };
+
+      stepperEl.querySelector('[data-step="prev"]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        stepperEl._cyclePrev();
+      });
+      stepperEl.querySelector('[data-step="next"]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        stepperEl._cycleNext();
+      });
+    }
+
+    // ============================================
+    // VIRTUAL KEYBOARD
+    // ============================================
+    const vkModal = document.getElementById('vkModal');
+    const vkLabel = document.getElementById('vkLabel');
+    const vkDisplay = document.getElementById('vkDisplay');
+    const vkKeyboard = document.getElementById('vkKeyboard');
+    const vkValidation = document.getElementById('vkValidation');
+    const vkDone = document.getElementById('vkDone');
+
+    let vkActiveField = null;
+    let vkBuffer = '';
+
+    // Per-field validation rules (live)
+    const VK_RULES = {
+      name: {
+        hint: 'Min 2 chars',
+        check: (v) => v.length >= 2,
+        error: (v) => `Too short (${v.length}/2 chars)`,
+        showCounter: false
+      },
+      email: {
+        hint: 'Valid email format required',
+        check: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        error: (v) => 'Invalid email format',
+        showCounter: false
+      },
+      message: {
+        hint: 'Min 10 chars',
+        check: (v) => v.length >= 10,
+        error: (v) => `Too short (${v.length}/10 chars)`,
+        showCounter: true
+      }
+    };
+
+    function getActiveFieldType() {
+      if (!vkActiveField) return null;
+      return vkActiveField.dataset.field;
+    }
+
+    function updateVKValidation() {
+      const fieldType = getActiveFieldType();
+      const rule = VK_RULES[fieldType];
+      if (!rule) {
+        vkValidation.style.display = 'none';
+        vkDone.classList.remove('disabled');
+        return;
+      }
+      vkValidation.style.display = '';
+
+      if (vkBuffer.length === 0) {
+        vkValidation.className = 'vk-validation hint';
+        vkValidation.textContent = `// ${rule.hint.toUpperCase()}`;
+        vkDone.classList.add('disabled');
+        return;
+      }
+
+      if (rule.check(vkBuffer)) {
+        vkValidation.className = 'vk-validation success';
+        vkValidation.innerHTML = rule.showCounter
+          ? `✓ VALID <span class="vk-counter">(${vkBuffer.length} CHARS)</span>`
+          : '✓ VALID';
+        vkDone.classList.remove('disabled');
+      } else {
+        vkValidation.className = 'vk-validation error';
+        vkValidation.textContent = `⚠ ${rule.error(vkBuffer).toUpperCase()}`;
+        vkDone.classList.add('disabled');
+      }
+    }
+
+    const VK_LAYOUT = [
+      ['1','2','3','4','5','6','7','8','9','0'],
+      ['Q','W','E','R','T','Y','U','I','O','P'],
+      ['A','S','D','F','G','H','J','K','L'],
+      ['Z','X','C','V','B','N','M','.','@'],
+      ['-','_',',','?','!','/']
+    ];
+
+    function buildVKKeyboard() {
+      vkKeyboard.innerHTML = '';
+      VK_LAYOUT.forEach(row => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'vk-row';
+        row.forEach(char => {
+          const key = document.createElement('div');
+          key.className = 'vk-key';
+          key.textContent = char;
+          key.dataset.vkChar = char;
+          key.addEventListener('click', (e) => { e.stopPropagation(); vkPress(char); });
+          rowEl.appendChild(key);
+        });
+        vkKeyboard.appendChild(rowEl);
+      });
+      // Bottom row: backspace + space
+      const bottomRow = document.createElement('div');
+      bottomRow.className = 'vk-row';
+      const back = document.createElement('div');
+      back.className = 'vk-key wide';
+      back.textContent = '⌫ DELETE';
+      back.addEventListener('click', (e) => { e.stopPropagation(); vkBackspace(); });
+      bottomRow.appendChild(back);
+      const space = document.createElement('div');
+      space.className = 'vk-key wide';
+      space.textContent = 'SPACE';
+      space.style.minWidth = '180px';
+      space.dataset.vkChar = ' ';
+      space.addEventListener('click', (e) => { e.stopPropagation(); vkPress(' '); });
+      bottomRow.appendChild(space);
+      vkKeyboard.appendChild(bottomRow);
+    }
+    buildVKKeyboard();
+
+    function openVK(trigger) {
+      vkActiveField = trigger.closest('.form-field');
+      const hiddenInput = vkActiveField.querySelector('input[type="hidden"]');
+      vkBuffer = hiddenInput.value || '';
+      const label = vkActiveField.querySelector('label').textContent;
+      vkLabel.textContent = `// ${label.toUpperCase()}`;
+      updateVKDisplay();
+      updateVKValidation();
+      vkModal.classList.add('show');
+      playClick();
+    }
+
+    function isVKValid() {
+      const fieldType = getActiveFieldType();
+      const rule = VK_RULES[fieldType];
+      if (!rule) return true;
+      return rule.check(vkBuffer);
+    }
+
+    function closeVK(commit = true) {
+      // Block commit if invalid — fail silently with a shake on the validation badge
+      if (commit && !isVKValid()) {
+        vkValidation.classList.remove('hint', 'success');
+        vkValidation.classList.add('error');
+        vkValidation.style.animation = 'errorShake 0.3s ease';
+        setTimeout(() => { vkValidation.style.animation = ''; }, 300);
+        playBack();
+        return;
+      }
+      if (commit && vkActiveField) {
+        const hiddenInput = vkActiveField.querySelector('input[type="hidden"]');
+        const valueEl = vkActiveField.querySelector('.vk-trigger-value');
+        const trigger = vkActiveField.querySelector('.vk-trigger');
+        hiddenInput.value = vkBuffer;
+        if (vkBuffer) {
+          valueEl.textContent = vkBuffer;
+          valueEl.classList.remove('placeholder');
+          vkActiveField.classList.remove('error');
+        } else {
+          valueEl.textContent = trigger.dataset.placeholder;
+          valueEl.classList.add('placeholder');
+        }
+      }
+      vkModal.classList.remove('show');
+      vkActiveField = null;
+      playBack();
+    }
+
+    function vkPress(char) {
+      if (vkBuffer.length >= 2000) return;
+      vkBuffer += char;
+      updateVKDisplay();
+      updateVKValidation();
+      flashVKKey(char.toUpperCase());
+      playNav();
+    }
+
+    function vkBackspace() {
+      if (vkBuffer.length === 0) return;
+      vkBuffer = vkBuffer.slice(0, -1);
+      updateVKDisplay();
+      updateVKValidation();
+      playBack();
+    }
+
+    function updateVKDisplay() {
+      if (!vkBuffer) {
+        vkDisplay.innerHTML = '<span class="vk-placeholder">[ EMPTY ]</span><span class="vk-cursor"></span>';
+        return;
+      }
+      const escaped = vkBuffer
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/\n/g,'<br>');
+      vkDisplay.innerHTML = escaped + '<span class="vk-cursor"></span>';
+      vkDisplay.scrollTop = vkDisplay.scrollHeight;
+    }
+
+    function flashVKKey(char) {
+      const key = vkKeyboard.querySelector(`.vk-key[data-vk-char="${char}"]`);
+      if (key) {
+        key.classList.add('active');
+        setTimeout(() => key.classList.remove('active'), 130);
+      }
+    }
+
+    // VK action buttons
+    vkModal.querySelectorAll('.vk-action').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.vkAction;
+        if (action === 'done') closeVK(true);
+        else closeVK(false);
+      });
+    });
+
+    // Physical keyboard typing while VK is open
+    document.addEventListener('keydown', (e) => {
+      if (!vkModal.classList.contains('show')) return;
+      e.stopPropagation();
+      if (e.key === 'Escape') { e.preventDefault(); closeVK(false); return; }
+      if (e.key === 'Enter')  { e.preventDefault(); closeVK(true); return; }
+      if (e.key === 'Backspace') { e.preventDefault(); vkBackspace(); return; }
+      if (e.key.length === 1) { e.preventDefault(); vkPress(e.key); return; }
+    }, true);
+
+    // ============================================
+    // FORM VALIDATION + SUBMIT
+    // ============================================
+    const FEEDBACK_URL = 'https://feedback.uncle-z.com/v1/feedback';
+    const FEEDBACK_API_KEY = '4b0e0bf1f63188fb5590c4fa12a2efa605aaad4c582fb3f5b9e2a361cd4c358d';
+
+    function showFieldError(form, fieldName, msg) {
+      const field = form.querySelector(`[data-field="${fieldName}"]`);
+      if (!field) return;
+      field.classList.add('error');
+      const err = field.querySelector('.form-error');
+      if (err && msg) err.textContent = '// ' + msg;
+    }
+
+    function clearFieldErrors(form) {
+      form.querySelectorAll('.form-field.error').forEach(f => f.classList.remove('error'));
+    }
+
+    function validateInquiry(form) {
+      clearFieldErrors(form);
+      let valid = true;
+      const name = (form.name.value || '').trim();
+      const email = (form.email.value || '').trim();
+      const message = (form.message.value || '').trim();
+
+      if (!name || name.length < 2) {
+        showFieldError(form, 'name', 'Player name required (min 2 chars)');
+        valid = false;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showFieldError(form, 'email', 'Valid email required');
+        valid = false;
+      }
+      if (!message || message.length < 10) {
+        showFieldError(form, 'message', 'Message too short (min 10 chars)');
+        valid = false;
+      }
+      return valid;
+    }
+
+    async function submitInquiry() {
+      const form = document.getElementById('inquiryForm');
+      const statusEl = document.getElementById('ifStatus');
+      const submitBtn = document.getElementById('ifSubmit');
+      if (!form || !statusEl || !submitBtn) return;
+
+      if (!validateInquiry(form)) {
+        playBack();
+        statusEl.textContent = '';
+        statusEl.className = 'form-status';
+        statusEl.style.display = 'none';
+        return;
+      }
+      statusEl.style.display = '';
+
+      playClick();
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const topic = form.topic.value;
+      const message = form.message.value.trim();
+
+      submitBtn.classList.add('disabled');
+      submitBtn.innerHTML = 'TRANSMITTING<span class="ext-icon">...</span>';
+      statusEl.textContent = '// Sending...';
+      statusEl.className = 'form-status';
+
+      const fd = new FormData();
+      fd.append('message', `[${topic}] from ${name}\n\n${message}`);
+      fd.append('email', email);
+      fd.append('metadata', JSON.stringify({ name, topic, source: 'uncle-z.com/play' }));
+
+      try {
+        const res = await fetch(FEEDBACK_URL, {
+          method: 'POST',
+          headers: { 'X-API-Key': FEEDBACK_API_KEY, 'X-Service': 'other' },
+          body: fd
+        });
+        if (!res.ok) throw new Error(`Server responded ${res.status}`);
+        statusEl.textContent = '// Message transmitted · We\'ll be in touch';
+        statusEl.className = 'form-status success';
+        // Reset form
+        form.querySelectorAll('input[type="hidden"]').forEach(i => {
+          if (i.name !== 'topic') i.value = '';
+        });
+        form.querySelectorAll('.vk-trigger-value').forEach(v => {
+          const trigger = v.closest('.vk-trigger');
+          if (trigger && trigger.dataset.input !== 'topic') {
+            v.textContent = trigger.dataset.placeholder;
+            v.classList.add('placeholder');
+          }
+        });
+        submitBtn.innerHTML = 'SENT ✓';
+        setTimeout(() => {
+          submitBtn.classList.remove('disabled');
+          submitBtn.innerHTML = 'SEND ANOTHER <span class="ext-icon">→</span>';
+        }, 3000);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = '// Transmission failed · Try email instead';
+        statusEl.className = 'form-status error';
+        submitBtn.classList.remove('disabled');
+        submitBtn.innerHTML = 'RETRY <span class="ext-icon">→</span>';
+      }
+    }
+
+
+    // ============================================
+    // MENU HOOKUP
+    // ============================================
+    function hookMenu(actions, previews, customItems) {
+      const items = customItems || mainEl.querySelectorAll('.menu-item');
+      currentIndex = 0;
+      if (items.length) {
+        items[0].classList.add('active');
+        if (previews[0]) setPreview(`<div class="preview-tag">${previews[0].tag}</div><div class="preview-text">${previews[0].text}</div>`);
+      }
+
+      items.forEach((item, idx) => {
+        item.addEventListener('mouseenter', () => setActive(items, previews, idx));
+        item.addEventListener('click', (e) => {
+          // For form-field elements (vk-trigger / game-stepper), let their own click handlers run too
+          if (!item.classList.contains('vk-trigger') && !item.classList.contains('game-stepper')) {
+            e.preventDefault();
+            actions[idx] && actions[idx]();
+          } else {
+            // For form fields, still update active state but don't double-fire the action
+            // (their own click handlers handle the interaction)
+            setActive(items, previews, idx);
+          }
+        });
+      });
+
+      window._activeItems = items;
+      window._activeActions = actions;
+      window._activePreviews = previews;
+    }
+
+    function setActive(items, previews, idx) {
+      if (idx === currentIndex) return;
+      items.forEach(i => i.classList.remove('active'));
+      items[idx].classList.add('active');
+      currentIndex = idx;
+      playNav();
+      if (previews[idx]) setPreview(`<div class="preview-tag">${previews[idx].tag}</div><div class="preview-text">${previews[idx].text}</div>`);
+      // Auto-scroll active item into view if offscreen (helps when form errors push content beyond viewport)
+      try {
+        items[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } catch (_) {}
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    function navigateTo(scene) {
+      playClick();
+      sceneStack.push(currentScene);
+      setTimeout(() => render(scene), 200);
+    }
+
+    function goBack() {
+      playBack();
+      const prev = sceneStack.pop() || 'main';
+      setTimeout(() => render(prev), 200);
+    }
+
+    function render(scene) {
+      switch (scene) {
+        case 'products':     renderProducts(); break;
+        case 'story':        renderStory(); break;
+        case 'capabilities': renderCapabilities(); break;
+        case 'contact':      renderContact(); break;
+        case 'inquiry':      renderInquiry(); break;
+        case 'minigta':      renderMiniGta(); break;
+        default:             sceneStack = []; renderMain();
+      }
+    }
+
+    // ============================================
+    // KEYBOARD
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+      if (!started && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        startExperience();
+        return;
+      }
+      if (!started) return;
+
+      // Block all input during boot/loading
+      if (bootInProgress) {
+        e.preventDefault();
+        return;
+      }
+
+      if (creditsModal.classList.contains('show')) {
+        if (e.key === 'Escape') closeCredits();
+        return;
+      }
+
+      // If a form input has focus, let the native input handle keys
+      // (except ESC which exits back to the menu)
+      const active = document.activeElement;
+      if (active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName)) {
+        if (e.key === 'Escape') {
+          active.blur();
+        }
+        return;
+      }
+
+      const items = window._activeItems;
+      const actions = window._activeActions;
+      const previews = window._activePreviews;
+      if (!items || !items.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActive(items, previews, (currentIndex + 1) % items.length);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActive(items, previews, (currentIndex - 1 + items.length) % items.length);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        // Cycle stepper options if active item is a stepper
+        const active = items[currentIndex];
+        if (active && active.classList.contains('game-stepper') && active._cyclePrev && active._cycleNext) {
+          e.preventDefault();
+          if (e.key === 'ArrowLeft') active._cyclePrev();
+          else active._cycleNext();
+        }
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        actions[currentIndex] && actions[currentIndex]();
+      } else if (e.key === 'Escape') {
+        if (currentScene !== 'main') goBack();
+      }
+    });
+
+    // ============================================
+    // START EXPERIENCE
+    // ============================================
+    function startExperience() {
+      if (started) return;
+      started = true;
+      // Attempt to enter fullscreen + lock landscape (best-effort)
+      tryLandscapeLock();
+      runBoot();
+      startSound.currentTime = 0;
+      startSound.play().catch(()=>{});
+      if (musicOn) bgMusic.play().catch(()=>{});
+      startOverlay.classList.add('hidden');
+      setTimeout(() => startOverlay.style.display = 'none', 600);
+      renderMain();
+      startRecTimer();
+    }
+
+    startOverlay.addEventListener('click', startExperience);
+
+    // ============================================
+    // Gaming cursor
+    // ============================================
+    (function initGameCursor() {
+      const cursor = document.getElementById('gameCursor');
+      const ring = document.getElementById('gameCursorRing');
+      if (!cursor || !ring) return;
+
+      let mouseX = -50, mouseY = -50;
+      let ringX = -50, ringY = -50;
+
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursor.style.left = mouseX + 'px';
+        cursor.style.top = mouseY + 'px';
+      });
+
+      // Smooth-follow ring
+      function animateRing() {
+        ringX += (mouseX - ringX) * 0.22;
+        ringY += (mouseY - ringY) * 0.22;
+        ring.style.left = ringX + 'px';
+        ring.style.top = ringY + 'px';
+        requestAnimationFrame(animateRing);
+      }
+      animateRing();
+
+      // Hover expand on interactive elements (event delegation)
+      const hoverSelector = 'a, button, .menu-item, .audio-toggle, #creditsBtn, .creditsClose, .start-overlay, [data-hover]';
+      document.addEventListener('mouseover', e => {
+        if (e.target.closest && e.target.closest(hoverSelector)) {
+          ring.classList.add('hover');
+        }
+      });
+      document.addEventListener('mouseout', e => {
+        if (e.target.closest && e.target.closest(hoverSelector)) {
+          ring.classList.remove('hover');
+        }
+      });
+
+      // Click pulse
+      document.addEventListener('mousedown', e => {
+        const pulse = document.createElement('div');
+        pulse.className = 'game-cursor-pulse';
+        pulse.style.left = e.clientX + 'px';
+        pulse.style.top = e.clientY + 'px';
+        document.body.appendChild(pulse);
+        setTimeout(() => pulse.remove(), 520);
+      });
+
+      // Hide cursor when mouse leaves window
+      document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+        ring.style.opacity = '0';
+      });
+      document.addEventListener('mouseenter', () => {
+        cursor.style.opacity = '1';
+        ring.style.opacity = '';
+      });
+    })();
+
+    // Best-effort landscape lock — works on Android Chrome, ignored elsewhere
+    function tryLandscapeLock() {
+      const el = document.documentElement;
+      const enterFs =
+        el.requestFullscreen ||
+        el.webkitRequestFullscreen ||
+        el.msRequestFullscreen;
+      if (enterFs) {
+        enterFs.call(el).then(() => {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+          }
+        }).catch(() => {});
+      }
+    }
+
+    // ============================================
+    // REC TIMER
+    // ============================================
+    let elapsed = 0;
+    function startRecTimer() {
+      setInterval(() => {
+        if (!started) return;
+        elapsed++;
+        const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+        const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+        const s = String(elapsed%60).padStart(2,'0');
+        document.getElementById('recTime').textContent = `GAME ${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    // ============================================
+    // AUDIO TOGGLE
+    // ============================================
+    audioToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      musicOn = !musicOn;
+      if (musicOn) {
+        bgMusic.play().catch(()=>{});
+        audioToggle.textContent = '♪ MUSIC: ON';
+      } else {
+        bgMusic.pause();
+        audioToggle.textContent = '♪ MUSIC: OFF';
+      }
+    });
+
+    // ============================================
+    // CREDITS MODAL
+    // ============================================
+    function openCredits() {
+      playClick();
+      creditsModal.classList.add('show');
+    }
+    function closeCredits() {
+      playClick();
+      creditsModal.classList.remove('show');
+    }
+    creditsBtn.addEventListener('click', openCredits);
+    creditsClose.addEventListener('click', closeCredits);
+    creditsModal.addEventListener('click', (e) => {
+      if (e.target === creditsModal) closeCredits();
+    });
+
+  </script>
+</body>
+</html>
