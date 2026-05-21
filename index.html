@@ -959,10 +959,7 @@
 
     @media (max-width: 768px) {
       .game-mode-entry {
-        bottom: 12px;
-        left: 12px;
-        font-size: 9px;
-        padding: 4px 8px;
+        display: none;
       }
     }
 
@@ -1123,10 +1120,10 @@
     /* Responsive — Mobile */
     @media (max-width: 600px) {
       .slide {
-        padding: 24px 20px;
-        padding-top: 60px;
+        padding: 60px 20px 80px 20px;
         align-items: flex-start;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .hero-name {
