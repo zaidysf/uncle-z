@@ -1716,8 +1716,8 @@
     line-height: 1.6;
   }
 
-  /* Show rotate prompt only on portrait mobile/tablet */
-  @media (orientation: portrait) and (max-width: 1024px) {
+  /* Block any touch device — game mode requires desktop with mouse + keyboard */
+  @media (hover: none), (pointer: coarse), (max-width: 900px) {
     .rotate-prompt { display: flex; }
     body > *:not(.rotate-prompt) { visibility: hidden; }
     .bg-video { display: none; }
@@ -1747,20 +1747,25 @@
     <div class="rotate-content">
       <div class="rotate-rec">
         <span class="rotate-rec-dot"></span>
-        <span>LANDSCAPE REQUIRED</span>
+        <span>DESKTOP REQUIRED</span>
       </div>
-      <svg class="rotate-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <svg class="rotate-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="animation:none;">
         <!-- Phone body -->
         <rect x="35" y="12" width="30" height="76" rx="5"/>
         <!-- Phone screen highlight -->
         <rect class="screen" x="39" y="18" width="22" height="60" rx="2"/>
         <!-- Speaker dot -->
         <circle cx="50" cy="84" r="1.5" fill="rgba(255,255,255,0.6)"/>
-        <!-- Curved rotation arrow around phone -->
-        <path class="arrow" d="M 14 38 A 30 30 0 0 1 38 14"/>
-        <path class="arrow" d="M 38 14 L 32 12 M 38 14 L 36 20"/>
+        <!-- Red X across phone -->
+        <line x1="40" y1="22" x2="60" y2="78" stroke="#ff3838" stroke-width="3" stroke-linecap="round"/>
+        <line x1="60" y1="22" x2="40" y2="78" stroke="#ff3838" stroke-width="3" stroke-linecap="round"/>
       </svg>
-      <div class="rotate-title">ROTATE<br>YOUR DEVICE</div>
+      <div class="rotate-title">GAME MODE<br>FOR DESKTOP ONLY</div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 2px; text-transform: uppercase; margin-top: 18px; line-height: 1.6;">
+        // OPEN ON A COMPUTER<br>
+        // WITH KEYBOARD + MOUSE
+      </div>
+      <a href="/" style="display: inline-block; margin-top: 28px; padding: 10px 22px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--coral); letter-spacing: 3px; text-transform: uppercase; text-decoration: none; border: 1px solid var(--coral);">◀ BACK TO UNCLE-Z</a>
     </div>
   </div>
 
