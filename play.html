@@ -1716,8 +1716,9 @@
     line-height: 1.6;
   }
 
-  /* Block any touch device — game mode requires desktop with mouse + keyboard */
-  @media (hover: none), (pointer: coarse), (max-width: 900px) {
+  /* Too small to play: game mode needs a big landscape screen. iPad (landscape), TV and desktop all play:
+     tap, a TV remote (arrows + OK) or keyboard + mouse. Phones and small windows get the prompt. */
+  @media (max-width: 899px), (max-height: 499px) {
     .rotate-prompt { display: flex; }
     body > *:not(.rotate-prompt) { visibility: hidden; }
     .bg-video { display: none; }
@@ -1742,12 +1743,12 @@
   <div class="game-cursor" id="gameCursor"></div>
   <div class="game-cursor-ring" id="gameCursorRing"></div>
 
-  <!-- Rotate device prompt (portrait mobile only) -->
+  <!-- Too-small-screen prompt (phones, iPad portrait, small windows) -->
   <div class="rotate-prompt" id="rotatePrompt">
     <div class="rotate-content">
       <div class="rotate-rec">
         <span class="rotate-rec-dot"></span>
-        <span>DESKTOP REQUIRED</span>
+        <span>BIGGER SCREEN REQUIRED</span>
       </div>
       <svg class="rotate-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="animation:none;">
         <!-- Phone body -->
@@ -1760,10 +1761,10 @@
         <line x1="40" y1="22" x2="60" y2="78" stroke="#ff3838" stroke-width="3" stroke-linecap="round"/>
         <line x1="60" y1="22" x2="40" y2="78" stroke="#ff3838" stroke-width="3" stroke-linecap="round"/>
       </svg>
-      <div class="rotate-title">GAME MODE<br>FOR DESKTOP ONLY</div>
+      <div class="rotate-title">GAME MODE<br>NEEDS A BIG SCREEN</div>
       <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 2px; text-transform: uppercase; margin-top: 18px; line-height: 1.6;">
-        // OPEN ON A COMPUTER<br>
-        // WITH KEYBOARD + MOUSE
+        // ROTATE YOUR IPAD TO LANDSCAPE<br>
+        // OR OPEN ON A TV OR COMPUTER
       </div>
       <a href="/" style="display: inline-block; margin-top: 28px; padding: 10px 22px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--coral); letter-spacing: 3px; text-transform: uppercase; text-decoration: none; border: 1px solid var(--coral);">◀ BACK TO UNCLE-Z</a>
     </div>
