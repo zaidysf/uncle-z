@@ -441,6 +441,8 @@
         <div>Cops pursue at higher wanted levels (1–5 ★)</div>
         <div>Press <kbd>R</kbd> to respawn anywhere</div>
         <div>The city is infinite — explore!</div>
+        <div><b>iPad:</b> joystick moves (up = gas in a car), touch the right side to aim + fire, CAR / GUN / RUN buttons</div>
+        <div><b>TV remote:</b> arrows move (↑ = gas), OK fires, Back pauses</div>
       </div>
     </div>
     <button class="big-btn" data-action="back">← BACK</button>
@@ -448,6 +450,37 @@
 </div>
 
 
+
+<!-- Touch (iPad) and TV-remote controls. They only feed the game's own inputs (keys, mouse), nothing else changes:
+     touch: joystick (move / steer, up = gas, down = brake then reverse), touch the right half to aim + fire there,
+     CAR / GUN / RUN buttons; TV remote: arrows move, OK fires (aim follows the walking direction), Back pauses,
+     arrows + OK work the menus. -->
+<style>
+  #touch-ui{position:fixed;inset:0;z-index:30;pointer-events:none;display:none;}
+  #touch-ui.on{display:block;}
+  #touch-ui .zone{position:absolute;pointer-events:auto;touch-action:none;}
+  #tj-zone{left:0;bottom:0;width:42vw;height:62vh;}
+  #aim-zone{right:0;top:12vh;width:52vw;height:88vh;}
+  #tj-base{position:absolute;left:34px;bottom:120px;width:150px;height:150px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.28);background:rgba(0,0,0,.28);pointer-events:none;}
+  #tj-knob{position:absolute;left:45px;top:45px;width:60px;height:60px;border-radius:50%;
+    background:rgba(255,140,40,.78);box-shadow:0 0 18px rgba(255,140,40,.5);}
+  #touch-btns{position:absolute;right:26px;bottom:290px;display:flex;flex-direction:column;gap:12px;pointer-events:auto;}
+  #touch-btns button{width:74px;height:74px;border-radius:50%;border:2px solid rgba(255,255,255,.35);
+    background:rgba(0,0,0,.45);color:#fff;font:700 13px/1 'JetBrains Mono',monospace;letter-spacing:1px;touch-action:none;}
+  #touch-btns button.held{background:rgba(255,140,40,.8);}
+  @media (pointer: coarse){ .controls{display:none !important;} }
+  .modal button:focus-visible,.modal button.tv-focus{outline:3px solid #ff8c28;outline-offset:3px;}
+</style>
+<div id="touch-ui">
+  <div class="zone" id="tj-zone"><div id="tj-base"><div id="tj-knob"></div></div></div>
+  <div class="zone" id="aim-zone"></div>
+  <div id="touch-btns">
+    <button id="tb-car">CAR</button>
+    <button id="tb-gun">GUN</button>
+    <button id="tb-run">RUN</button>
+  </div>
+</div>
 
 <script>
 /* =============================================================
@@ -963,7 +996,7 @@ window.addEventListener('keydown', e=>{
     toast(['PISTOL','RIFLE'][player.weapon]);
   }
   if (e.key === 'Backspace'){ e.preventDefault(); tryEnterExit(); }
-  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+  if (gameState === 'playing' && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
 });
 window.addEventListener('keyup', e=>{
   keys[e.key.toLowerCase()] = false;
@@ -1643,7 +1676,7 @@ function update(dt){
   const lf = keys['a']||keys['arrowleft'];
   const rt = keys['d']||keys['arrowright'];
   const sprint = keys['shift'];
-  const throttle = keys['p'];                  // car gas pedal
+  const throttle = keys['p'] || keys['arrowup']; // car gas pedal (P, or ↑ for TV remotes and touch)
   const reverse  = keys[';'] || keys['semicolon'];
   // SPACE / left-click attacks on foot
   const attacking = !player.inCar && (keys['space'] || keys[' '] || mouse.down);
@@ -3049,11 +3082,118 @@ function updateHUD(){
   speedEl.innerHTML = Math.floor(sp) + '<small>MPH</small>';
 }
 
+// ---------- touch (iPad) and TV-remote controls: they only feed keys / mouse (markup: #touch-ui above) ----------
+(() => {
+  // shown after the first real touch: TV browsers report a coarse pointer too, but never touch
+  let touched = false;
+  window.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') touched = true; }, true);
+  const capture = (el, id) => { try { el.setPointerCapture(id); } catch (_) { /* pointer already gone */ } };
+  const ui = document.getElementById('touch-ui');
+  const knob = document.getElementById('tj-knob'), base = document.getElementById('tj-base');
+  let usedMouse = false, aimTouch = null, stick = null, lastDir = {x: 0, y: -1};
+  const MOVE = ['w', 'a', 's', 'd', 'p', ';'];
+  const toCanvas = (cx, cy) => { const r = cvs.getBoundingClientRect(); return {x: (cx - r.left) * cvs.width / r.width, y: (cy - r.top) * cvs.height / r.height}; };
+  window.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && (e.movementX || e.movementY)) usedMouse = true; });
+
+  // joystick: direction -> the same keys the keyboard sets
+  function setStick(dx, dy) {
+    MOVE.forEach(k => keys[k] = false);
+    const len = Math.hypot(dx, dy), max = 55, t = 0.35;
+    const nx = len > max ? dx / len * max : dx, ny = len > max ? dy / len * max : dy;
+    knob.style.transform = `translate(${nx}px, ${ny}px)`;
+    const x = nx / max, y = ny / max;
+    if (Math.hypot(x, y) < 0.2) return;
+    lastDir = {x, y};
+    if (player.inCar) {
+      if (y < -t) keys['p'] = true; else if (y > t) keys[';'] = true;
+      if (x < -t) keys['a'] = true; else if (x > t) keys['d'] = true;
+    } else {
+      if (y < -t) keys['w'] = true; else if (y > t) keys['s'] = true;
+      if (x < -t) keys['a'] = true; else if (x > t) keys['d'] = true;
+    }
+  }
+  const tj = document.getElementById('tj-zone');
+  tj.addEventListener('pointerdown', e => {
+    e.preventDefault(); capture(tj, e.pointerId);
+    const r = base.getBoundingClientRect();
+    stick = {id: e.pointerId, cx: r.left + r.width / 2, cy: r.top + r.height / 2};
+    setStick(e.clientX - stick.cx, e.clientY - stick.cy);
+  });
+  tj.addEventListener('pointermove', e => { if (stick && e.pointerId === stick.id) { e.preventDefault(); setStick(e.clientX - stick.cx, e.clientY - stick.cy); } });
+  const endStick = e => { if (stick && e.pointerId === stick.id) { stick = null; setStick(0, 0); } };
+  tj.addEventListener('pointerup', endStick); tj.addEventListener('pointercancel', endStick);
+
+  // right half: aim at the finger and fire while it is down
+  const aim = document.getElementById('aim-zone');
+  aim.addEventListener('pointerdown', e => {
+    e.preventDefault(); capture(aim, e.pointerId); aimTouch = e.pointerId;
+    Object.assign(mouse, toCanvas(e.clientX, e.clientY)); mouse.down = true;
+  });
+  aim.addEventListener('pointermove', e => { if (e.pointerId === aimTouch) { e.preventDefault(); Object.assign(mouse, toCanvas(e.clientX, e.clientY)); } });
+  const endAim = e => { if (e.pointerId === aimTouch) { aimTouch = null; mouse.down = false; } };
+  aim.addEventListener('pointerup', endAim); aim.addEventListener('pointercancel', endAim);
+
+  // buttons
+  const tap = (id, fn) => document.getElementById(id).addEventListener('pointerdown', e => { e.preventDefault(); fn(); });
+  tap('tb-car', () => tryEnterExit());
+  tap('tb-gun', () => { player.weapon = 1 - player.weapon; toast(['PISTOL', 'RIFLE'][player.weapon]); });
+  const run = document.getElementById('tb-run');
+  run.addEventListener('pointerdown', e => { e.preventDefault(); keys['shift'] = true; run.classList.add('held'); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => run.addEventListener(ev, () => { keys['shift'] = false; run.classList.remove('held'); }));
+  document.getElementById('wasted').addEventListener('pointerdown', () => { if (gameState === 'playing' && touched) respawn(); });
+
+  // TV remote: OK fires while playing, Back pauses, arrows + OK move through menu buttons
+  const BACK = ['GoBack', 'BrowserBack'], BACK_CODES = [10009, 461];
+  function menuButtons() {
+    const m = [...document.querySelectorAll('.modal')].find(el => !el.classList.contains('hidden'));
+    return m ? [...m.querySelectorAll('button')].filter(b => b.offsetParent) : [];
+  }
+  window.addEventListener('keydown', e => {
+    if (BACK.includes(e.key) || BACK_CODES.includes(e.keyCode)) {
+      e.preventDefault();
+      if (gameState === 'playing') { gameState = 'paused'; setMenuVisibility(); }
+      else if (gameState === 'paused') { gameState = 'playing'; setMenuVisibility(); }
+      return;
+    }
+    if (gameState === 'playing') {
+      if (e.key === 'Enter') { keys['space'] = true; e.preventDefault(); }
+      return;
+    }
+    if (gameState === 'splash') return;            // Enter starts the game (its own handler)
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      const bs = menuButtons(); if (!bs.length) return;
+      e.preventDefault();
+      const i = bs.indexOf(document.activeElement);
+      const n = i < 0 ? 0 : (i + (e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? bs.length - 1 : 1)) % bs.length;
+      bs.forEach(b => b.classList.remove('tv-focus')); bs[n].focus(); bs[n].classList.add('tv-focus');
+    }
+  }, true);
+  window.addEventListener('keyup', e => { if (e.key === 'Enter') keys['space'] = false; }, true);
+
+  // every frame: touch UI only while playing; without a mouse, on-foot aim follows the walking direction
+  (function frame() {
+    const playing = gameState === 'playing';
+    ui.classList.toggle('on', touched && playing);
+    if (playing && !usedMouse && aimTouch === null && !player.inCar) {
+      let dx = 0, dy = 0;
+      if (keys['w'] || keys['arrowup']) dy -= 1; if (keys['s'] || keys['arrowdown']) dy += 1;
+      if (keys['a'] || keys['arrowleft']) dx -= 1; if (keys['d'] || keys['arrowright']) dx += 1;
+      if (dx || dy) lastDir = {x: dx, y: dy};
+      const l = Math.hypot(lastDir.x, lastDir.y) || 1;
+      mouse.x = cvs.width / 2 + lastDir.x / l * 160; mouse.y = cvs.height / 2 + lastDir.y / l * 160;
+    }
+    if (!playing && (stick || aimTouch !== null)) { stick = null; aimTouch = null; mouse.down = false; setStick(0, 0); }
+    requestAnimationFrame(frame);
+  })();
+})();
+if (/[?&]debug\b/.test(location.search)) window.__gta = { player, bullets, get state(){ return gameState; } };
+
 // boot
 spawnWorld();
 requestAnimationFrame(loop);
 
 })();
 </script>
+
 </body>
 </html>
