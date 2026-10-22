@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Toolz — Privacy Policy</title>
+<title>ToolzPad — Privacy Policy</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -67,65 +67,162 @@
   a { color: #6B9FFF; text-decoration: none; }
   a:hover { text-decoration: underline; }
 </style>
+<style>table{border-collapse:collapse;width:100%;margin-bottom:12px}th,td{font-size:14px;color:#424245;text-align:left;vertical-align:top;padding:8px;border:1px solid #e5e5e7}</style>
 </head>
 <body>
 <div class="container">
-
-<h1>Privacy Policy</h1>
-<p class="subtitle">Toolz for macOS &mdash; Last updated: March 11, 2026</p>
-
-<div class="highlight">
-<p><strong>Toolz does not collect, store, or transmit any personal data.</strong> Everything stays on your Mac.</p>
-</div>
-
-<h2>Overview</h2>
-<p>Toolz is a collection of productivity utilities for macOS. We are committed to protecting your privacy. This policy explains what data Toolz accesses and how it is handled.</p>
-
-<h2>Data Collection</h2>
-<p>Toolz collects <strong>no data whatsoever</strong>. Specifically:</p>
+<h1 id="toolzpad-privacy-policy">ToolzPad Privacy Policy</h1>
+<p>Applies to: ToolzPad for iPhone and iPad, and ToolzPad Desktop for
+Mac (together, "the Apps"). Publisher: Muhammad Zaid Taufiq Yasyaf, the
+seller shown on the App Store listing, trading as uncle-z.com ("we",
+"us"). Last updated: October 22, 2026</p>
+<h2 id="the-short-version">The short version</h2>
 <ul>
-  <li>No personal information is collected</li>
-  <li>No usage analytics or telemetry</li>
-  <li>No crash reports sent to us</li>
-  <li>No advertising or tracking</li>
-  <li>No network requests to our servers (the only network features are described under Third-Party Services)</li>
-  <li>No account or registration required</li>
+<li>The Apps do not have accounts, do not send us your data, and do not
+include ads, analytics or tracking SDKs.</li>
+<li>Your tool inputs, history and settings stay on your device.</li>
+<li>Two features connect to the internet, only when you use them or when
+the app opens: PingZ (checks a host you choose) and the update check
+(asks Apple's App Store whether a newer version exists). Details
+below.</li>
 </ul>
-
-<h2>Local Data</h2>
-<p>Toolz keeps the following data <strong>locally on your Mac only</strong>:</p>
+<h2 id="1-what-we-collect">1. What we collect</h2>
+<p>We collect no personal data. We do not operate servers that receive
+data from the Apps. We cannot see what you type, photograph, scan or
+calculate.</p>
+<h2 id="2-data-stored-on-your-device">2. Data stored on your device</h2>
+<p>The Apps store the following on your device only, using Apple's local
+storage (UserDefaults, app storage, and the app's shared container for
+widgets). We cannot read it. It is deleted when you delete the app.</p>
 <ul>
-  <li><strong>Keyboard shortcuts</strong> &mdash; Your custom hotkey preferences (saved in macOS UserDefaults)</li>
-  <li><strong>Clipboard history</strong> &mdash; Recent clipboard items (text and images), kept in memory while the app runs, not saved to disk, and cleared when you quit</li>
-  <li><strong>Timer settings</strong> &mdash; Your focus and break duration preferences (saved in macOS UserDefaults)</li>
+<li>Settings and preferences, such as timer durations, favorites, tool
+order and keyboard shortcuts.</li>
+<li>Local tool-use counts on iPhone, which only order the "For You"
+list.</li>
+<li>Tool history you keep: TipZ bill history (last 10 bills), and recent
+conversion and other tool results where the app saves them.</li>
+<li>InvoiceZ details you enter, such as your business name, logo and
+invoice numbering.</li>
+<li>Widget data shared between the app and its widgets.</li>
 </ul>
-<p>This data never leaves your device and is not accessible to us or any third party.</p>
-
-<h2>Permissions</h2>
-<p>Toolz may request the following macOS permissions:</p>
+<p>Some history is kept only while the app is running and is cleared
+when you quit or relaunch: PassZ recent passwords, HashZ recent hashes,
+and the ToolzPad Desktop clipboard history (up to 50 items).</p>
+<h2 id="3-permissions-and-how-each-is-used">3. Permissions and how each
+is used</h2>
+<p>Each permission is requested only when you use the tool that needs
+it. You can deny any permission; only that tool is affected.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Permission</th>
+<th>Tool</th>
+<th>How it is used</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Camera</td>
+<td>ScanZ, QRZ (iPhone and iPad)</td>
+<td>Text and QR code recognition. Processed on the device. Not saved or
+sent.</td>
+</tr>
+<tr class="even">
+<td>Photo Library (read)</td>
+<td>ScanZ, EraseZ, ShrinkZ, DocZ, WatermarkZ, FileConvertZ, GifZ</td>
+<td>The photos you select are processed on the device. Not
+uploaded.</td>
+</tr>
+<tr class="odd">
+<td>Photo Library (add)</td>
+<td>Saving compressed or edited images</td>
+<td>Writes the images you save to your Photos library.</td>
+</tr>
+<tr class="even">
+<td>Location (when in use)</td>
+<td>CompassZ (iPhone and iPad)</td>
+<td>Shows heading, coordinates and bearing calculations on the device.
+Not stored and not sent.</td>
+</tr>
+<tr class="odd">
+<td>Screen Recording</td>
+<td>TextScanz, ColorPikz, RulerZ, ScreenRecZ (Mac)</td>
+<td>Captures the screen area you choose to read text, pick colors,
+measure, or record. Processed on the device. Recordings are saved only
+where you choose.</td>
+</tr>
+<tr class="even">
+<td>Clipboard (Mac, no permission prompt)</td>
+<td>ClipboardZ (Mac)</td>
+<td>The app watches the clipboard while it runs to build the history you
+see. Items stay in memory, are not written to disk, and are cleared when
+you quit.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-network-connections">4. Network connections</h2>
 <ul>
-  <li><strong>Screen Recording</strong> &mdash; Required by TextScanz (OCR) and ColorPikz (color picker) to capture screen content. Screen Recording is used only to capture the area you choose; captures are processed on your Mac, and files are saved only where you choose.</li>
-  <li><strong>Accessibility</strong> &mdash; Required for global keyboard shortcuts to function system-wide.</li>
+<li>PingZ: when you run a check, the app sends a request to the host you
+type. That host, and your internet provider, see your IP address and the
+request, as they would for any web request. We do not receive it.</li>
+<li>Update check: when the app opens, it asks Apple's iTunes Lookup
+service for the current App Store version of ToolzPad. Apple receives
+the request, including your IP address, as with any App Store request.
+The app does not download or install anything.</li>
+<li>Purchase verification: the app checks its App Store receipt with
+Apple's StoreKit. This is handled by Apple.</li>
+<li>No other network connections are made by the Apps.</li>
 </ul>
-
-<h2>Third-Party Services</h2>
-<p>The app uses only Apple's App Store services (update check and purchase verification). We use no other third-party services, SDKs, or analytics platforms.</p>
-<p>Tools run on your Mac. The only network features are PingZ, which contacts a host you enter when you run it, and a check on launch against Apple's App Store for a newer version.</p>
-
-<h2>Children's Privacy</h2>
-<p>Toolz does not collect any data from anyone, including children under 13.</p>
-
-<h2>Changes to This Policy</h2>
-<p>If we update this privacy policy, we will post the revised version on this page with an updated date. Since Toolz collects no data, we do not anticipate significant changes.</p>
-
-<h2>Contact</h2>
-<p>If you have questions about this privacy policy, contact us at:</p>
-<p><a href="https://uncle-z.com">uncle-z.com</a></p>
-
-<div class="footer">
-  <p>&copy; 2026 Zaid &mdash; <a href="https://uncle-z.com">uncle-z.com</a></p>
-</div>
-
+<h2 id="5-ai-assistants-toolzpad-desktop-mcp-server">5. AI assistants
+(ToolzPad Desktop MCP server)</h2>
+<p>ToolzPad Desktop includes an MCP server that lets AI assistants you
+choose (for example Claude or Cursor) run ToolzPad tools. The server
+runs on your Mac and talks only to the assistant you connect. Any data
+you send through an assistant, including tool outputs, is handled by
+that assistant's provider under its own privacy policy and terms. We do
+not receive it.</p>
+<h2 id="6-analytics-advertising-and-third-parties">6. Analytics,
+advertising and third parties</h2>
+<ul>
+<li>We do not use analytics, crash reporting, advertising, or tracking
+in the Apps.</li>
+<li>We do not use the advertising identifier and do not request App
+Tracking Transparency permission.</li>
+<li>We do not sell or share data, because we do not hold any.</li>
+<li>The Apps include no third-party SDKs. Apple provides the App Store,
+StoreKit and iTunes Lookup services described above.</li>
+</ul>
+<h2 id="7-website">7. Website</h2>
+<p>The website at toolzpad.uncle-z.com and uncle-z.com uses Umami, a
+privacy-friendly analytics tool that we run on our own server. Umami
+sets no cookies and records page views in aggregate. It keeps a small
+value in your browser's local storage to count visits. Your browser or
+hosting provider may keep standard server logs.</p>
+<h2 id="8-children">8. Children</h2>
+<p>The Apps do not knowingly collect data from anyone, including
+children, because they collect no personal data. The Apps do not require
+an account.</p>
+<h2 id="9-your-rights">9. Your rights</h2>
+<p>Under Indonesia's Personal Data Protection Law (UU No. 27/2022) and
+similar laws, you may ask for access, correction, deletion, restriction
+or objection regarding personal data held about you. Because the Apps do
+not send us personal data, we normally hold none. If you believe we hold
+data about you, contact us and we will confirm.</p>
+<p>To remove data the Apps store on your device, delete the app.</p>
+<h2 id="10-security">10. Security</h2>
+<p>Data stays on your device, protected by your device's security. We
+have no server-side data to breach. You are responsible for securing
+your device and any backups you make (iCloud or Mac backup), which are
+handled by Apple.</p>
+<h2 id="11-changes">11. Changes</h2>
+<p>We may update this policy. The date at the top will change, and the
+current version will always be at this page. Material changes will also
+be noted in the Apps' release notes.</p>
+<h2 id="12-contact">12. Contact</h2>
+<p>Questions about this policy: <a
+href="mailto:hello@uncle-z.com">hello@uncle-z.com</a> Website: <a
+href="https://uncle-z.com">https://uncle-z.com</a></p>
+<div class="footer"><p>&copy; 2026 Zaid &mdash; <a href="https://uncle-z.com">uncle-z.com</a></p></div>
 </div>
 </body>
 </html>
