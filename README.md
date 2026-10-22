@@ -16,7 +16,7 @@ The marketing site for **uncle-z** — an independent product studio shipping AI
 
 1. **Hero** — wordmark, one-line studio pitch, contact links, "Explore →"
 2. **What we build** — `Products that solve real problems.` Studio one-liner + 4 stat cards (9+ Products, 30+ Projects, 10+ Years, ∞ Team) + tag row (`AI · SaaS · Native apps · E-commerce · Dev tools`)
-3. **What we ship** — 3×3 product grid (JarvisClaw, HRDex, HAKU, SplitEasy, ToolzPad, ZClawd, Quay, Skoru, Posz) — each card has name, category tag, blurb, outbound link
+3. **What we ship** — product grid (Aminly, Quay, Posz, Knurl, HRDex, Pakem, SplitEasy, ToolzPad, Skoru, ZClawd) — each card has name, category tag, blurb, a "Visit site" button and the official store badges for the stores where the product is live (`assets/badges/`)
 4. **Led by Zaid. Built by the team.** — founder bio + "previously at" tags (Tokopedia, Mekari, Perqara, Denning IT, UangTeman) + Connect links
 5. **The studio stack.** — capabilities grouped by Languages / Databases / Cloud & DevOps / Frontend / Mobile / AI & ML / Domain Expertise
 6. **Let's build something great.** — contact form (name, email, topic dropdown, message) + GitHub / LinkedIn / `hello@uncle-z.com`
@@ -27,7 +27,7 @@ uncle-z is positioned as an **independent product studio** that:
 - Builds and ships its own SaaS / AI / mobile products (the 9 on slide 3)
 - Takes on consulting, partnerships, and project inquiries (slide 6 contact form)
 
-The 9 products under the umbrella are the studio's portfolio of bets. Some are run as standalone businesses on their own domains (`hrdex.co`, `jarvisclaw.id`, `hakuidn.com`, `quay.uncle-z.com`, etc.).
+The 9 products under the umbrella are the studio's portfolio of bets. Some are run as standalone businesses on their own domains (`hrdex.co`, `knurl.work`, `quay.uncle-z.com`, etc.).
 
 ## Tech stack (this site itself)
 

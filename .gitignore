@@ -63,3 +63,4 @@ sw.*
 
 # Generated files
 public/sitemap.xml
+.shots/

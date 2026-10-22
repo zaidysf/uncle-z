@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>uncle-z — independent product studio</title>
   <meta name="description" content="uncle-z is an independent product studio building tools, AI, and SaaS for Indonesian and global markets. Founded by Zaid Yasyaf.">
+  <link rel="canonical" href="https://uncle-z.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="uncle-z">
+  <meta property="og:title" content="uncle-z — independent product studio">
+  <meta property="og:description" content="uncle-z is an independent product studio building tools, AI, and SaaS for Indonesian and global markets. Founded by Zaid Yasyaf.">
+  <meta property="og:url" content="https://uncle-z.com/">
+  <meta property="og:image" content="https://uncle-z.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="uncle-z — independent product studio">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" href="/favicon.png" sizes="any">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -547,6 +558,7 @@
       flex-direction: column;
       gap: 10px;
       min-height: 130px;
+      min-width: 0;
     }
 
     .project-card:hover {
@@ -606,28 +618,60 @@
       gap: 8px;
     }
 
-    .project-stores {
+    .project-actions {
       display: flex;
-      gap: 6px;
       flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 12px;
+      margin-top: 2px;
     }
 
-    .store-btn {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 4px 9px;
-      background: var(--blue);
-      color: #fff;
-      text-decoration: none;
-      letter-spacing: 0.3px;
-      transition: background 0.2s ease;
+    /* Official store badges: unmodified artwork, shown at/above each store's minimum size */
+    .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      line-height: 0;
+      transition: transform 0.2s ease;
     }
 
-    .store-btn:hover {
-      background: #1d4ed8;
+    .badge:hover { transform: translateY(-1px); }
+
+    .badge img { display: block; width: auto; }
+    .badge-apple img { height: 40px; }
+    /* Google's PNG carries its own clear space, so it is drawn larger to match the others */
+    .badge-play { margin: -8px -8px; }
+    .badge-play img { height: 58px; }
+    .badge-gallery img { height: 40px; }
+
+    .visit-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 9px 14px;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .visit-btn:hover {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* Products slide holds ten cards with store badges: let it scroll when the window is short */
+    .slide[data-slide="2"] {
+      overflow-y: auto;
+      align-items: flex-start;
+    }
+
+    .slide[data-slide="2"] > .slide-content {
+      margin-block: auto;
     }
 
     /* ===================== */
@@ -1391,7 +1435,7 @@
           </div>
           <div class="stat-grid animate-in d4">
             <div class="stat-card" data-hover>
-              <div class="stat-number">11<span class="unit">+</span></div>
+              <div class="stat-number">10</div>
               <div class="stat-desc">Products live or in dev</div>
             </div>
             <div class="stat-card" data-hover>
@@ -1417,97 +1461,116 @@
         <div class="section-label animate-in d1">Products</div>
         <h2 class="section-title animate-in d2">What we ship<span style="color:var(--coral)">.</span></h2>
         <div class="projects-grid">
-          <a href="https://aminly.app" target="_blank" class="project-card animate-in d3" data-hover>
+          <div class="project-card animate-in d3">
             <div class="project-header">
               <div class="project-name">Aminly</div>
               <div class="project-tag">Islamic · App</div>
             </div>
-            <div class="project-desc">All-in-one Muslim companion — Qur'an, prayer times, qibla, du'a. iOS &amp; Android · EN · ID · AR.</div>
-            <div class="project-url">aminly.app →</div>
-          </a>
-          <a href="https://quay.uncle-z.com" target="_blank" class="project-card animate-in d3" data-hover>
+            <div class="project-desc">Free Muslim app — Madani muṣḥaf, accurate prayer times and adhan, qibla, hadith and du'ā. No ads, no account.</div>
+            <div class="project-actions">
+              <a href="https://apps.apple.com/id/app/aminly-quran-prayer-times/id6770505277" target="_blank" rel="noopener" class="badge badge-apple" data-hover><img src="/assets/badges/app-store.svg" alt="Download Aminly on the App Store" loading="lazy"></a><a href="https://play.google.com/store/apps/details?id=app.aminly.mobile" target="_blank" rel="noopener" class="badge badge-play" data-hover><img src="/assets/badges/google-play.png" alt="Get Aminly on Google Play" loading="lazy"></a><a href="https://appgallery.huawei.com/app/C119327801" target="_blank" rel="noopener" class="badge badge-gallery" data-hover><img src="/assets/badges/appgallery.svg" alt="Explore Aminly on AppGallery" loading="lazy"></a>
+              <a href="https://aminly.app/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div class="project-card animate-in d3">
             <div class="project-header">
               <div class="project-name">Quay</div>
               <div class="project-tag">Dev Tools</div>
             </div>
-            <div class="project-desc">Native macOS database client — Postgres, MySQL/MariaDB, SQLite, MongoDB, Redis. Multi-engine in one app.</div>
-            <div class="project-url">quay.uncle-z.com →</div>
-          </a>
-          <a href="https://posz.uncle-z.com" target="_blank" class="project-card animate-in d4" data-hover>
+            <div class="project-desc">Native cross-platform database client for 20+ engines — SQL, MongoDB, Redis and more, with SSH tunneling and prod-tag confirmations.</div>
+            <div class="project-actions">
+              
+              <a href="https://quay.uncle-z.com/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div class="project-card animate-in d4">
             <div class="project-header">
               <div class="project-name">Posz</div>
               <div class="project-tag coral">F&amp;B · POS</div>
             </div>
-            <div class="project-desc">Restaurant and cafe POS — tablet-first ordering, back-office admin, real-time orders. QRIS-first, IDR, PPN 11%.</div>
-            <div class="project-url">posz.uncle-z.com →</div>
-          </a>
-          <a href="https://knurl.work" target="_blank" class="project-card animate-in d4" data-hover>
+            <div class="project-desc">Cashier, table ordering, kitchen, stock and reports in one system built for Indonesian F&amp;B operators.</div>
+            <div class="project-actions">
+              
+              <a href="https://posz.uncle-z.com/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div class="project-card animate-in d4">
             <div class="project-header">
               <div class="project-name">Knurl</div>
               <div class="project-tag coral">CMMS · SaaS</div>
             </div>
-            <div class="project-desc">Lightweight CMMS for factories, hotels, hospitals — work orders, QR-tagged assets, offline-capable mobile, no per-user pricing.</div>
-            <div class="project-url">knurl.work →</div>
-          </a>
-          <a href="https://spliteasy.uncle-z.com" target="_blank" class="project-card animate-in d5" data-hover>
-            <div class="project-header">
-              <div class="project-name">SplitEasy</div>
-              <div class="project-tag">Utilities</div>
+            <div class="project-desc">Simple, mobile-first work-order app for the team that keeps your building running. Photo proof on every fix. Works offline. No per-user pricing.</div>
+            <div class="project-actions">
+              
+              <a href="https://knurl.work/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
             </div>
-            <div class="project-desc">Receipt-OCR bill splitter for iPhone, iPad, and Android — scan, tap to assign items, see who owes what.</div>
-            <div class="project-url">spliteasy.uncle-z.com →</div>
-          </a>
-          <a href="https://jarvisclaw.id" target="_blank" class="project-card animate-in d5" data-hover>
-            <div class="project-header">
-              <div class="project-name">JarvisClaw</div>
-              <div class="project-tag coral">AI · SaaS</div>
-            </div>
-            <div class="project-desc">Managed hosting platform for OpenClaw AI personal assistant — Indonesian-market SaaS with multi-provider VPS provisioning.</div>
-            <div class="project-url">jarvisclaw.id →</div>
-          </a>
-          <a href="https://hrdex.co" target="_blank" class="project-card animate-in d6" data-hover>
+          </div>
+          <div class="project-card animate-in d5">
             <div class="project-header">
               <div class="project-name">HRDex</div>
               <div class="project-tag coral">Productivity</div>
             </div>
-            <div class="project-desc">Chat-first HR self-service SaaS — employees manage leave, attendance, and payslips via WhatsApp and Telegram bots.</div>
-            <div class="project-url">hrdex.co →</div>
-          </a>
-          <a href="https://hakuidn.com" target="_blank" class="project-card animate-in d6" data-hover>
-            <div class="project-header">
-              <div class="project-name">HAKU</div>
-              <div class="project-tag coral">E-Commerce</div>
+            <div class="project-desc">Leave approvals, attendance tracking and payslips, managed through chat apps like Telegram, Slack and WhatsApp. No app downloads.</div>
+            <div class="project-actions">
+              
+              <a href="https://hrdex.co/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
             </div>
-            <div class="project-desc">Women's fashion e-commerce — minimalist, European-inspired clothing brand with curated collections.</div>
-            <div class="project-url">hakuidn.com →</div>
-          </a>
-          <div class="project-card animate-in d7" data-hover>
+          </div>
+          <div class="project-card animate-in d5">
+            <div class="project-header">
+              <div class="project-name">Pakem</div>
+              <div class="project-tag coral">Restaurants · SaaS</div>
+            </div>
+            <div class="project-desc">Admin panel for cafés, restaurants and chains: SOP workflows, users and roles, and every store in one place.</div>
+            <div class="project-actions">
+              
+              <a href="https://pakem.uncle-z.com/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div class="project-card animate-in d6">
+            <div class="project-header">
+              <div class="project-name">SplitEasy</div>
+              <div class="project-tag">Utilities</div>
+            </div>
+            <div class="project-desc">Snap the receipt, tap who had what, and SplitEasy does the math — tax, tip and the awkward bits.</div>
+            <div class="project-actions">
+              <a href="https://apps.apple.com/id/app/spliteasy-bill-splitter/id6764665919" target="_blank" rel="noopener" class="badge badge-apple" data-hover><img src="/assets/badges/app-store.svg" alt="Download SplitEasy on the App Store" loading="lazy"></a>
+              <a href="https://spliteasy.uncle-z.com/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div class="project-card animate-in d6">
             <div class="project-header">
               <div class="project-name">ToolzPad</div>
               <div class="project-tag">Utilities</div>
             </div>
-            <div class="project-desc">Everyday utility app for iOS &amp; macOS — a collection of handy tools for daily quick wins.</div>
-            <div class="project-stores">
-              <a href="https://apps.apple.com/id/app/toolzpad/id6761078050" target="_blank" class="store-btn" data-hover>iOS App Store →</a>
-              <a href="https://apps.apple.com/us/app/toolzpad-desktop/id6761079394" target="_blank" class="store-btn" data-hover>Mac App Store →</a>
+            <div class="project-desc">OCR, QR codes, file converter, passwords, invoices, JSON and more in one private app. No ads, no subscription.</div>
+            <div class="project-actions">
+              <a href="https://apps.apple.com/id/app/toolzpad/id6761078050" target="_blank" rel="noopener" class="badge badge-apple" data-hover><img src="/assets/badges/app-store.svg" alt="Download ToolzPad on the App Store" loading="lazy"></a><a href="https://apps.apple.com/id/app/toolzpad-desktop/id6761079394" target="_blank" rel="noopener" class="badge badge-apple" data-hover><img src="/assets/badges/mac-app-store.svg" alt="Download ToolzPad Desktop on the Mac App Store" loading="lazy"></a>
+              <a href="https://toolzpad.uncle-z.com/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
             </div>
           </div>
-          <a href="https://github.com/zaidysf/zclawd" target="_blank" class="project-card animate-in d7" data-hover>
+          <div class="project-card animate-in d7">
+            <div class="project-header">
+              <div class="project-name">Skoru</div>
+              <div class="project-tag coral">Sports · SaaS</div>
+            </div>
+            <div class="project-desc">Real-time live scoreboard for amateur and recreational sports. Track scores and share live games.</div>
+            <div class="project-actions">
+              
+              <a href="https://skoru.club/" target="_blank" rel="noopener" class="visit-btn" data-hover>Visit site <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+          <div class="project-card animate-in d7">
             <div class="project-header">
               <div class="project-name">ZClawd</div>
               <div class="project-tag coral">AI · Open Source</div>
             </div>
             <div class="project-desc">Always-on AI assistant powered by Claude Code — open-source OpenClaw alternative with Telegram and long-term memory.</div>
-            <div class="project-url">github.com/zaidysf/zclawd →</div>
-          </a>
-          <a href="https://skoru.club" target="_blank" class="project-card animate-in d7" data-hover>
-            <div class="project-header">
-              <div class="project-name">Skoru</div>
-              <div class="project-tag coral">Sports · SaaS</div>
+            <div class="project-actions">
+              
+              <a href="https://github.com/zaidysf/zclawd" target="_blank" rel="noopener" class="visit-btn" data-hover>View on GitHub <span aria-hidden="true">→</span></a>
             </div>
-            <div class="project-desc">Live scoreboard SaaS for amateur and recreational sports — real-time scoring via mobile or web with shareable live links.</div>
-            <div class="project-url">skoru.club →</div>
-          </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1795,6 +1858,9 @@
     let wheelLocked = false;
 
     document.addEventListener('wheel', (e) => {
+      // Let a tall slide (the products grid on a short window) scroll vertically
+      const sl = e.target.closest && e.target.closest('.slide');
+      if (sl && Math.abs(e.deltaY) > Math.abs(e.deltaX) && sl.scrollHeight > sl.clientHeight) return;
       e.preventDefault();
       if (!onboardingDismissed) { dismissOnboarding(); return; }
       if (wheelLocked) return;

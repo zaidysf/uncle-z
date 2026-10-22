@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>uncle-z — GAME MODE</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="canonical" href="https://uncle-z.com/play">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="uncle-z">
+<meta property="og:title" content="uncle-z — GAME MODE">
+<meta property="og:description" content="uncle-z GAME MODE — an interactive studio menu. Press start.">
+<meta property="og:url" content="https://uncle-z.com/play">
+<meta property="og:image" content="https://uncle-z.com/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="uncle-z GAME MODE — an interactive studio menu. Press start.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1882,17 +1895,16 @@
     // SCENE DATA
     // ============================================
     const PRODUCTS = [
-      { name: 'Aminly',      tag: 'Islamic · App',      url: 'https://aminly.app',                        desc: 'All-in-one Muslim companion — Qur\'an, prayer times, qibla, du\'a. iOS & Android · EN · ID · AR.' },
-      { name: 'Quay',        tag: 'Dev Tools',          url: 'https://quay.uncle-z.com',                  desc: 'Native macOS database client — Postgres, MySQL/MariaDB, SQLite, MongoDB, Redis. Multi-engine in one app.' },
-      { name: 'Posz',        tag: 'F&B · POS',          url: 'https://posz.uncle-z.com',                  desc: 'Restaurant and cafe POS — tablet-first ordering, back-office admin, real-time orders. QRIS-first, IDR, PPN 11%.' },
-      { name: 'Knurl',       tag: 'CMMS · SaaS',        url: 'https://knurl.work',                        desc: 'Lightweight CMMS for factories, hotels, hospitals — work orders, QR-tagged assets, offline-capable mobile, no per-user pricing.' },
-      { name: 'SplitEasy',   tag: 'Utilities',          url: 'https://spliteasy.uncle-z.com',             desc: 'Receipt-OCR bill splitter for iPhone, iPad, and Android — scan, tap to assign items, see who owes what.' },
-      { name: 'JarvisClaw',  tag: 'AI · SaaS',          url: 'https://jarvisclaw.id',                     desc: 'Managed hosting platform for OpenClaw AI personal assistant — Indonesian-market SaaS with multi-provider VPS provisioning.' },
-      { name: 'HRDex',       tag: 'Productivity',       url: 'https://hrdex.co',                          desc: 'Chat-first HR self-service SaaS — employees manage leave, attendance, and payslips via WhatsApp and Telegram bots.' },
-      { name: 'HAKU',        tag: 'E-Commerce',         url: 'https://hakuidn.com',                       desc: "Women's fashion e-commerce — minimalist, European-inspired clothing brand with curated collections." },
-      { name: 'ToolzPad',    tag: 'Utilities',          url: 'https://apps.apple.com/id/app/toolzpad/id6761078050', desc: 'Everyday utility app for iOS & macOS — a collection of handy tools for daily quick wins.' },
-      { name: 'ZClawd',      tag: 'AI · Open Source',   url: 'https://github.com/zaidysf/zclawd',         desc: 'Always-on AI assistant powered by Claude Code — open-source OpenClaw alternative with Telegram and long-term memory.' },
-      { name: 'Skoru',       tag: 'Sports · SaaS',      url: 'https://skoru.club',                        desc: 'Live scoreboard SaaS for amateur and recreational sports — real-time scoring via mobile or web with shareable live links.' }
+      { name: 'Aminly',      tag: 'Islamic · App',      url: 'https://aminly.app/',                       desc: 'Free Muslim app — Madani muṣḥaf, accurate prayer times and adhan, qibla, hadith and du\'ā. iPhone, Android, Huawei. No ads, no account.' },
+      { name: 'Quay',        tag: 'Dev Tools',          url: 'https://quay.uncle-z.com/',                 desc: 'Native cross-platform database client for 20+ engines — SQL, MongoDB, Redis and more, with SSH tunneling and prod-tag confirmations.' },
+      { name: 'Posz',        tag: 'F&B · POS',          url: 'https://posz.uncle-z.com/',                 desc: 'Cashier, table ordering, kitchen, stock and reports in one system built for Indonesian F&B operators.' },
+      { name: 'Knurl',       tag: 'CMMS · SaaS',        url: 'https://knurl.work/',                       desc: 'Simple, mobile-first work-order app for the team that keeps your building running. Works offline. No per-user pricing.' },
+      { name: 'HRDex',       tag: 'Productivity',       url: 'https://hrdex.co/',                         desc: 'Leave approvals, attendance tracking and payslips, managed through chat apps like Telegram, Slack and WhatsApp.' },
+      { name: 'Pakem',       tag: 'Restaurants · SaaS', url: 'https://pakem.uncle-z.com/',                desc: 'Admin panel for cafés, restaurants and chains: SOP workflows, users and roles, and every store in one place.' },
+      { name: 'SplitEasy',   tag: 'Utilities',          url: 'https://spliteasy.uncle-z.com/',            desc: 'Snap the receipt, tap who had what, and SplitEasy does the math — tax, tip and the awkward bits. On the App Store.' },
+      { name: 'ToolzPad',    tag: 'Utilities',          url: 'https://toolzpad.uncle-z.com/',             desc: 'OCR, QR codes, file converter, passwords, invoices, JSON and more in one private app. iPhone and Mac.' },
+      { name: 'Skoru',       tag: 'Sports · SaaS',      url: 'https://skoru.club/',                       desc: 'Real-time live scoreboard for amateur and recreational sports. Track scores and share live games.' },
+      { name: 'ZClawd',      tag: 'AI · Open Source',   url: 'https://github.com/zaidysf/zclawd',         desc: 'Always-on AI assistant powered by Claude Code — open-source OpenClaw alternative with Telegram and long-term memory.' }
     ];
 
     const SKILLS = [
@@ -1980,7 +1992,7 @@
         'INITIALIZING SYSTEM',
         'LOADING STUDIO MODULE',
         'MOUNTING PRODUCT REGISTRY',
-        '11 PRODUCTS DETECTED',
+        '10 PRODUCTS DETECTED',
         'AUDIO SUBSYSTEM',
         'SHADER COMPILATION',
         'READY'
@@ -2064,7 +2076,7 @@
             </div>
           </div>
           <div class="menu" id="menuList">
-            <div class="menu-item" data-action="products">PRODUCTS <span class="tag">11 SHIPPED</span></div>
+            <div class="menu-item" data-action="products">PRODUCTS <span class="tag">10 SHIPPED</span></div>
             <div class="menu-item" data-action="story">STORY MODE</div>
             <div class="menu-item" data-action="capabilities">CAPABILITIES</div>
             <div class="menu-item" data-action="contact">WORK WITH US</div>
@@ -2085,7 +2097,7 @@
         () => { playBack(); setTimeout(() => window.location.href = '/', 400); }
       ], [
         { tag: 'GT* 5 · BETA', text: 'Launch Grand Theft Arcade — top-down city sandbox. Press Enter to play.' },
-        { tag: 'PRODUCTS', text: '11 live and in-development products across AI, SaaS, native apps, and developer tools.' },
+        { tag: 'PRODUCTS', text: '10 live and in-development products across AI, SaaS, native apps, and developer tools.' },
         { tag: 'STORY MODE', text: 'Meet Zaid Yasyaf — the founder behind uncle-z. Ex-Tokopedia, ex-Mekari, 10+ years building software.' },
         { tag: 'CAPABILITIES', text: 'The full studio stack: languages, databases, cloud, mobile, AI/ML. What we build with.' },
         { tag: 'WORK WITH US', text: 'Project inquiries, consulting, partnerships, or just say hi.' },
@@ -2141,7 +2153,7 @@
       mainEl.innerHTML = `
         <div class="title-block scene">
           <div class="scene-title"><span class="accent">PRODUCTS<span style="color:var(--coral)">.</span></span></div>
-          <div class="scene-subtitle">11 PROJECTS · LIVE &amp; IN DEV</div>
+          <div class="scene-subtitle">10 PROJECTS · LIVE &amp; IN DEV</div>
         </div>
         <div class="right-content scene">
           <div class="menu" id="menuList">
